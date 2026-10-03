@@ -1,5 +1,6 @@
 from math import floor
 import numpy as np
+import pandas as pd
 
 
 def compute_optimal_war(N, X, P, players):
@@ -25,6 +26,17 @@ def compute_optimal_war(N, X, P, players):
                     if war > m[i, b]:
                         m[i, b] = war
                         s[i, b] = j
+    print_matrix(m)
+    print_matrix(s)
 
-    optimal_war = m[N + 1, B + 1]
+    optimal_war = m[N, B]
     return optimal_war, s
+
+
+def print_matrix(matrix):
+    df = pd.DataFrame(
+        matrix,
+        index=[f"Ruolo {i}" if i > 0 else "Base (0)" for i in range(matrix.shape[0])],
+        columns=[f"b={b}" for b in range(matrix.shape[1])],
+    )
+    print(df.to_string())
