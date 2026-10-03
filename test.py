@@ -35,11 +35,12 @@ N, X, P, players = load_scenario("scenarios/test_N3_X20_P4.json")
 print(f"Scenario caricato con successo! N: {N}, X: {X}, P: {P}")
 
 (optimal_war, s), time_dp_ms = get_pure_execution_time(
-    compute_war_single_row, N, X, P, players, repetitions=15
+    compute_war_standard, N, X, P, players, repetitions=15
 )
 print(f"Optimal WAR: {optimal_war:.2f}")
 print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
 
+"""
 (signed_players, total_cost), time_dp_ms = get_pure_execution_time(
     reconstruct_optimal_roster, N, X, players, s, repetitions=15
 )
@@ -48,4 +49,4 @@ print("Roster ottimale:")
 for player in signed_players:
     print(f"  - {player.name}: {player.war} WAR")
 
-print(f"Total cost: {total_cost}")
+print(f"Total cost: {total_cost}")"""
