@@ -1,6 +1,9 @@
 from load_scenario_by_json import load_scenario
-from valore_ottimo import compute_optimal_war
-from soluzione_ottima import reconstruct_optimal_roster
+from src.algorithms.valore_ottimo import compute_optimal_war as compute_war_standard
+from src.algorithms.soluzione_ottima import reconstruct_optimal_roster
+from src.algorithms.alg01_valore_ottimo_riga_singola import (
+    compute_optimal_war as compute_war_single_row,
+)
 import time
 
 
@@ -32,7 +35,7 @@ N, X, P, players = load_scenario("scenarios/test_N3_X20_P4.json")
 print(f"Scenario caricato con successo! N: {N}, X: {X}, P: {P}")
 
 (optimal_war, s), time_dp_ms = get_pure_execution_time(
-    compute_optimal_war, N, X, P, players, repetitions=15
+    compute_war_single_row, N, X, P, players, repetitions=15
 )
 print(f"Optimal WAR: {optimal_war:.2f}")
 print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
