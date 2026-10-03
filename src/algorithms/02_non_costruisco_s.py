@@ -1,0 +1,27 @@
+from math import floor
+import numpy as np
+
+
+def compute_optimal_war(N, X, P, players):
+    COST_UNIT = 100000
+    B = floor(X / COST_UNIT)
+
+    m = [[0.0] * (B + 1) for _ in range(N + 1)]
+
+    # Consider each position from 1 to N
+    for i in range(1, N + 1):
+        # Default choice: no free agent signed for position i
+        m[i][:] = m[i - 1][:]
+
+        for j in range(P):
+            p = players[i - 1][j]
+            c = p.cost // COST_UNIT
+            war_p = p.war
+
+            for b in range(c, B + 1):
+                war = m[i - 1][b - c] + war_p
+                if war > m[i][b]:
+                    m[i][b] = war
+
+    optimal_war = m[N][B]
+    return optimal_war, m
