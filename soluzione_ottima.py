@@ -9,7 +9,7 @@ def reconstruct_optimal_roster(N, X, players, s):
 
     # Trace back decisions form position N down to 1
     for i in range(N, 0, -1):
-        index = s[i, b]
+        index = s[i][b]
         # Check if a free agent was signed for position i
         # (index -1 means no free agent signed)
         if index != -1:
