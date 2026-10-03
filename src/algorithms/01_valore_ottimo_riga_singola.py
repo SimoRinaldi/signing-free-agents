@@ -1,15 +1,13 @@
 from math import floor
-import numpy as np
 
 
 def compute_optimal_war(N, X, P, players):
     COST_UNIT = 100000
     B = floor(X / COST_UNIT)
 
-    previous_role_solution = np.zeros(B + 1, dtype=float)
-    current_role_solution = np.zeros(B + 1, dtype=float)
-    s = np.full((N + 1, B + 1), -1, dtype=int)
-
+    previous_role_solution = [0.0 for _ in range(B + 1)]
+    current_role_solution = [0.0 for _ in range(B + 1)]
+    s = [[-1] * (B + 1) for _ in range(N + 1)]
     # Consider each position from 1 to N
     for i in range(1, N + 1):
         # Initialize with previous role values to account for the option of signing no player for position i
@@ -25,7 +23,7 @@ def compute_optimal_war(N, X, P, players):
                 war = previous_role_solution[b - c] + war_p
                 if war > current_role_solution[b]:
                     current_role_solution[b] = war
-                    s[i, b] = j
+                    s[i][b] = j
 
         # Prepare for next position: shift current solution to previous
         previous_role_solution[:] = current_role_solution[:]
