@@ -51,16 +51,16 @@ print(f"Scenario caricato con successo! N: {N}, X: {X}, P: {P}")
 print("\n")
 print("-" * 10 + " Bottom Up Solver " + "-" * 10)
 
-(optimal_war, s), time_dp_ms = get_pure_execution_time(
+optimal_war, time_dp_ms = get_pure_execution_time(
     compute_war_standard, N, X, P, players, repetitions=15
 )
 print(f"Optimal WAR: {optimal_war:.2f}")
 print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
 
 print("\n")
-print("-" * 10 + " Bottom Up Solver " + "-" * 10)
+print("-" * 10 + " Bottom Up Solver (Original Loops) " + "-" * 10)
 
-(optimal_war, s), time_dp_ms = get_pure_execution_time(
+optimal_war, time_dp_ms = get_pure_execution_time(
     compute_optimal_war_original, N, X, P, players, repetitions=15
 )
 print(f"Optimal WAR: {optimal_war:.2f}")
@@ -69,7 +69,7 @@ print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
 print("\n")
 print("-" * 10 + " Space Efficient Solver " + "-" * 10)
 
-(optimal_war, s), time_dp_ms = get_pure_execution_time(
+optimal_war, time_dp_ms = get_pure_execution_time(
     compute_war_single_row, N, X, P, players, repetitions=15
 )
 print(f"Optimal WAR: {optimal_war:.2f}")
@@ -78,19 +78,25 @@ print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
 print("\n")
 print("-" * 10 + " Top Down Memoized " + "-" * 10)
 
-(optimal_war, s), time_dp_ms = get_pure_execution_time(
+optimal_war, time_dp_ms = get_pure_execution_time(
     compute_optimal_war_memoized, N, X, P, players, repetitions=15
 )
 print(f"Optimal WAR: {optimal_war:.2f}")
 print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
 
-"""
-(signed_players, total_cost), time_dp_ms = get_pure_execution_time(
-    reconstruct_optimal_roster, N, X, players, s, repetitions=15
-)
+print("\n")
+print("-" * 10 + " Reconstruction Test " + "-" * 10)
+optimal_war, m, s = compute_war_standard(N, X, P, players, return_tables=True)
 
-print("Roster ottimale:")
-for player in signed_players:
-    print(f"  - {player.name}: {player.war} WAR")
+# Ricostruzione con matrice decisionale s (approccio classico)
+signed_players_s, cost_s = reconstruct_optimal_roster(N, X, players, s)
+print(f"Roster ricostruito tramite matrice s (Costo: {cost_s}, Giocatori: {len(signed_players_s)}):")
+for p in signed_players_s:
+    print(f"  - {p.name}: {p.war} WAR (costo: {p.cost})")
 
-print(f"Total cost: {total_cost}")"""
+# Ricostruzione diretta da matrice valori m (senza s, -50% RAM)
+from src.algorithms.reconstruct_optimal_roster import reconstruct_optimal_roster_from_matrix
+signed_players_m, cost_m = reconstruct_optimal_roster_from_matrix(N, X, players, m)
+print(f"\nRoster ricostruito tramite matrice m senza s (Costo: {cost_m}, Giocatori: {len(signed_players_m)}):")
+for p in signed_players_m:
+    print(f"  - {p.name}: {p.war} WAR (costo: {p.cost})")

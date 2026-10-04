@@ -1,12 +1,12 @@
 from math import floor
 
 
-def compute_optimal_war(N, X, P, players):
+def compute_optimal_war(N, X, P, players, return_tables: bool = False):
     COST_UNIT = 100000
     B = floor(X / COST_UNIT)
 
     m = [[0.0] * (B + 1) for _ in range(N + 1)]
-    s = [[-1] * (B + 1) for _ in range(N + 1)]
+    s = [[-1] * (B + 1) for _ in range(N + 1)] if return_tables else None
 
     # Consider each position from 1 to N
     for i in range(1, N + 1):
@@ -22,18 +22,21 @@ def compute_optimal_war(N, X, P, players):
                 war = m[i - 1][b - c] + war_p
                 if war > m[i][b]:
                     m[i][b] = war
-                    s[i][b] = j
+                    if s is not None:
+                        s[i][b] = j
 
     optimal_war = m[N][B]
-    return optimal_war, s
+    if return_tables:
+        return optimal_war, m, s
+    return optimal_war
 
 
-def compute_optimal_war_original(N, X, P, players):
+def compute_optimal_war_original(N, X, P, players, return_tables: bool = False):
     COST_UNIT = 100000
     B = floor(X / COST_UNIT)
 
     m = [[0.0] * (B + 1) for _ in range(N + 1)]
-    s = [[-1] * (B + 1) for _ in range(N + 1)]
+    s = [[-1] * (B + 1) for _ in range(N + 1)] if return_tables else None
 
     # Consider each position from 1 to N
     for i in range(1, N + 1):
@@ -50,7 +53,10 @@ def compute_optimal_war_original(N, X, P, players):
                     war = m[i - 1][b - c] + p.war
                     if war > m[i][b]:
                         m[i][b] = war
-                        s[i][b] = j
+                        if s is not None:
+                            s[i][b] = j
 
     optimal_war = m[N][B]
-    return optimal_war, s
+    if return_tables:
+        return optimal_war, m, s
+    return optimal_war

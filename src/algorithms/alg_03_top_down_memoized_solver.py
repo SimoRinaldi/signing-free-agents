@@ -9,9 +9,6 @@ def compute_optimal_war_memoized(N, X, P, players):
     # Inizializzato a -1.0 per distinguere le celle già visitate da quelle inesplorate
     memo = [[-1.0] * (B + 1) for _ in range(N + 1)]
 
-    # s[i][b]: memorizza l'indice del giocatore scelto per lo stato (i, b)
-    s = [[-1] * (B + 1) for _ in range(N + 1)]
-
     def dp(i, b):
         # Caso base: nessun ruolo rimasto da considerare
         if i == 0:
@@ -23,7 +20,6 @@ def compute_optimal_war_memoized(N, X, P, players):
 
         # Scelta di default: nessun ingaggio per il ruolo i
         best_war = dp(i - 1, b)
-        best_choice = -1
 
         # Valuta ciascun candidato per il ruolo corrente
         for j in range(P):
@@ -34,15 +30,13 @@ def compute_optimal_war_memoized(N, X, P, players):
                 candidate_war = dp(i - 1, b - c) + p.war
                 if candidate_war > best_war:
                     best_war = candidate_war
-                    best_choice = j
 
         # Memoization: salva i risultati per evitare ricalcoli futuri
         memo[i][b] = best_war
-        s[i][b] = best_choice
 
         return best_war
 
     # Avvio della risoluzione partendo dal problema globale (ruolo N, budget B)
     optimal_war = dp(N, B)
 
-    return optimal_war, s
+    return optimal_war
