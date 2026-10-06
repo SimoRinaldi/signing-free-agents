@@ -8,6 +8,10 @@ from src.algorithms.alg_02_space_efficient_solver import (
     compute_optimal_war as compute_war_single_row,
 )
 from src.algorithms.alg_03_top_down_memoized_solver import compute_optimal_war_memoized
+from src.algorithms.alg_04_pareto_bottom_up import (
+    compute_optimal_war as compute_war_pareto,
+    compute_optimal_war_space_efficient as compute_war_pareto_space,
+)
 import time
 import pandas as pd
 
@@ -85,6 +89,24 @@ print(f"Optimal WAR: {optimal_war:.2f}")
 print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
 
 print("\n")
+print("-" * 10 + " Bottom Up Solver (Pareto Pruned) " + "-" * 10)
+
+optimal_war, time_dp_ms = get_pure_execution_time(
+    compute_war_pareto, N, X, P, players, repetitions=15
+)
+print(f"Optimal WAR: {optimal_war:.2f}")
+print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
+
+print("\n")
+print("-" * 10 + " Space Efficient Solver (Pareto Pruned) " + "-" * 10)
+
+optimal_war, time_dp_ms = get_pure_execution_time(
+    compute_war_pareto_space, N, X, P, players, repetitions=15
+)
+print(f"Optimal WAR: {optimal_war:.2f}")
+print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
+
+print("\n")
 print("-" * 10 + " Reconstruction Test " + "-" * 10)
 optimal_war, m, s = compute_war_standard(N, X, P, players, return_tables=True)
 
@@ -100,3 +122,11 @@ signed_players_m, cost_m = reconstruct_optimal_roster_from_matrix(N, X, players,
 print(f"\nRoster ricostruito tramite matrice m senza s (Costo: {cost_m}, Giocatori: {len(signed_players_m)}):")
 for p in signed_players_m:
     print(f"  - {p.name}: {p.war} WAR (costo: {p.cost})")
+
+# Ricostruzione con tabelle del solver con Pruning di Pareto
+_, m_p, s_p = compute_war_pareto(N, X, P, players, return_tables=True)
+signed_players_p, cost_p = reconstruct_optimal_roster(N, X, players, s_p)
+print(f"\nRoster ricostruito tramite matrice s (Pareto Pruned) (Costo: {cost_p}, Giocatori: {len(signed_players_p)}):")
+for p in signed_players_p:
+    print(f"  - {p.name}: {p.war} WAR (costo: {p.cost})")
+
