@@ -77,7 +77,7 @@ print("\n")
 print("-" * 10 + " Space Efficient Solver " + "-" * 10)
 
 optimal_war, time_dp_ms = get_pure_execution_time(
-    compute_optimal_war_with_one_vector, N, X, P, players, repetitions=15
+    compute_optimal_war_with_one_vector, N, X, players, repetitions=15
 )
 print(f"Optimal WAR: {optimal_war:.2f}")
 print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
