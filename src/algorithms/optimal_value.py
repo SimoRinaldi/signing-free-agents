@@ -1,16 +1,15 @@
 from math import floor
 
 
-def compute_optimal_war_return_tables(N, X, players):
+# Metodo originale che calcola la matrice m e la matrice s e ritorna il WAR ottimale e la matrice s
+def compute_optimal_war(N, X, players):
     COST_UNIT = 100000
     B = floor(X / COST_UNIT)
 
     m = [[0.0] * (B + 1) for _ in range(N + 1)]
     s = [[-1] * (B + 1) for _ in range(N + 1)]
 
-    # Consider each position from 1 to N
     for i in range(1, N + 1):
-        # Default choice: no free agent signed for position i
         m[i][:] = m[i - 1][:]
 
         for j in range(len(players[i - 1])):
@@ -29,15 +28,14 @@ def compute_optimal_war_return_tables(N, X, players):
     return optimal_war, s
 
 
-def compute_optimal_war_no_return_tables(N, X, players):
+# Metodo modificato che calcola solo la matrice m e ritorna il WAR ottimale e la matrice m
+def compute_optimal_war_without_s(N, X, players):
     COST_UNIT = 100000
     B = floor(X / COST_UNIT)
 
     m = [[0.0] * (B + 1) for _ in range(N + 1)]
 
-    # Consider each position from 1 to N
     for i in range(1, N + 1):
-        # Default choice: no free agent signed for position i
         m[i][:] = m[i - 1][:]
 
         for j in range(len(players[i - 1])):

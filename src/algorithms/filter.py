@@ -1,3 +1,4 @@
+# Metodo che filtra i giocatori in base al costo e al WAR, restituendo solo quelli validi per ogni ruolo.
 def players_filter(players, cost_unit, total_budget):
     valid_players = []
 
