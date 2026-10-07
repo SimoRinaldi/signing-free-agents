@@ -34,4 +34,4 @@ def load_scenario(file_path: str):
 
         players.append(role_players)
 
-    return N, X, P, players
+    return N, X, players

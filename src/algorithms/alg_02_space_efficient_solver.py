@@ -14,8 +14,7 @@ def compute_optimal_war(N, X, P, players):
             # Default choice: no free agent signed for position i
             best_war = solution[b]
 
-            for j in range(P):
-                p = players[i - 1][j]
+            for p in players[i - 1]:
                 c = p.cost // COST_UNIT
                 war_p = p.war
 
