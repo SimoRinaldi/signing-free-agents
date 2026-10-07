@@ -12,8 +12,7 @@ def compute_optimal_war(N, X, players):
     for i in range(1, N + 1):
         m[i][:] = m[i - 1][:]
 
-        for j in range(len(players[i - 1])):
-            p = players[i - 1][j]
+        for j, p in enumerate(players[i - 1]):
             c = p.cost // COST_UNIT
             war_p = p.war
 
@@ -21,8 +20,7 @@ def compute_optimal_war(N, X, players):
                 war = m[i - 1][b - c] + war_p
                 if war > m[i][b]:
                     m[i][b] = war
-                    if s is not None:
-                        s[i][b] = j
+                    s[i][b] = j
 
     optimal_war = m[N][B]
     return optimal_war, s
@@ -38,8 +36,7 @@ def compute_optimal_war_without_s(N, X, players):
     for i in range(1, N + 1):
         m[i][:] = m[i - 1][:]
 
-        for j in range(len(players[i - 1])):
-            p = players[i - 1][j]
+        for p in players[i - 1]:
             c = p.cost // COST_UNIT
             war_p = p.war
 

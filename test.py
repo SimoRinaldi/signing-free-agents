@@ -7,9 +7,9 @@ from src.algorithms.optimal_solution import (
     reconstruct_optimal_roster,
     reconstruct_optimal_roster_without_s,
 )
-from algorithms.space_optimized import compute_optimal_war_with_one_vector
-from algorithms.time_optimized import compute_optimal_war_with_recursion
-from src.algorithms.filter import players_filter
+from src.algorithms.space_optimized import compute_optimal_war_with_one_vector
+from src.algorithms.time_optimized import compute_optimal_war_with_recursion
+from src.algorithms.filter import filter_players
 import time
 
 
@@ -86,7 +86,7 @@ print("\n")
 print("-" * 10 + " Top Down Memoized " + "-" * 10)
 
 optimal_war, time_dp_ms = get_pure_execution_time(
-    compute_optimal_war_with_recursion, N, X, P, players, repetitions=15
+    compute_optimal_war_with_recursion, N, X, players, repetitions=15
 )
 print(f"Optimal WAR: {optimal_war:.2f}")
 print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
@@ -94,7 +94,7 @@ print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
 # Preparazione candidati filtrati secondo Pareto
 COST_UNIT = 100000
 total_budget = X // COST_UNIT
-filtered_players = players_filter(players, COST_UNIT, total_budget)
+filtered_players = filter_players(players, COST_UNIT, total_budget)
 
 print("\n")
 print("-" * 10 + " Bottom Up Solver (Pareto Pruned) " + "-" * 10)
@@ -109,7 +109,7 @@ print("\n")
 print("-" * 10 + " Space Efficient Solver (Pareto Pruned) " + "-" * 10)
 
 optimal_war, time_dp_ms = get_pure_execution_time(
-    compute_optimal_war_with_one_vector, N, X, P, filtered_players, repetitions=15
+    compute_optimal_war_with_one_vector, N, X, filtered_players, repetitions=15
 )
 print(f"Optimal WAR: {optimal_war:.2f}")
 print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
