@@ -1,17 +1,16 @@
 from math import floor
 
 
-def compute_optimal_war(N, X, P, players):
+# Metodo per calcolare il valore ottimo senza instanziare l'intera matrice m, ma solo un vettore di dimensione B+1
+def compute_optimal_war_with_one_vector(N, X, players):
     COST_UNIT = 100000
     B = floor(X / COST_UNIT)
 
     solution = [0.0 for _ in range(B + 1)]
-    # Consider each position from 1 to N
+
     for i in range(1, N + 1):
 
-        # Consider budget levels from c to B
         for b in range(B, -1, -1):
-            # Default choice: no free agent signed for position i
             best_war = solution[b]
 
             for p in players[i - 1]:
