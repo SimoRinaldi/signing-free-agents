@@ -11,6 +11,7 @@ from src.algorithms.space_optimized import compute_optimal_war_with_one_vector
 from src.algorithms.time_optimized import compute_optimal_war_with_recursion
 from src.algorithms.filter import filter_players
 import time
+import tracemalloc
 
 
 def get_pure_execution_time(func, *args, repetitions=10):
@@ -32,21 +33,27 @@ def get_pure_execution_time(func, *args, repetitions=10):
     return result, min_time_ms
 
 
-def print_matrix(matrix):
-    try:
-        import pandas as pd
+def get_peak_memory(func, *args):
+    """Misura il picco di memoria RAM allocata con una singola esecuzione dedicata."""
+    tracemalloc.start()
+    tracemalloc.reset_peak()
 
-        df = pd.DataFrame(
-            matrix,
-            index=[
-                f"Ruolo {i}" if i > 0 else "Base (0)" for i in range(matrix.shape[0])
-            ],
-            columns=[f"b={b}" for b in range(matrix.shape[1])],
-        )
-        print(df.to_string())
-    except ImportError:
-        for row in matrix:
-            print(row)
+    result = func(*args)
+
+    _, peak_bytes = tracemalloc.get_traced_memory()
+    tracemalloc.stop()
+
+    if isinstance(result, tuple):
+        result = result[0]
+
+    peak_kib = peak_bytes / 1024
+    return result, peak_kib
+
+
+def measure_performance(func, *args, repetitions=10):
+    result, time_ms = get_pure_execution_time(func, *args, repetitions=repetitions)
+    _, peak_kib = get_peak_memory(func, *args)
+    return result, time_ms, peak_kib
 
 
 # ---------------------------------------------------------------------------------
@@ -58,38 +65,42 @@ print(f"Scenario caricato con successo! N: {N}, X: {X}, P: {P}")
 print("\n")
 print("-" * 10 + " Bottom Up Solver (con tabella s) " + "-" * 10)
 
-optimal_war, time_dp_ms = get_pure_execution_time(
+optimal_war, time_ms, memory_kib = measure_performance(
     compute_optimal_war, N, X, players, repetitions=15
 )
 print(f"Optimal WAR: {optimal_war:.2f}")
-print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
+print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
+print(f"Picco memoria RAM: {memory_kib:.2f} KiB")
 
 print("\n")
 print("-" * 10 + " Bottom Up Solver (solo matrice m) " + "-" * 10)
 
-optimal_war, time_dp_ms = get_pure_execution_time(
+optimal_war, time_ms, memory_kib = measure_performance(
     compute_optimal_war_without_s, N, X, players, repetitions=15
 )
 print(f"Optimal WAR: {optimal_war:.2f}")
-print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
+print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
+print(f"Picco memoria RAM: {memory_kib:.2f} KiB")
 
 print("\n")
 print("-" * 10 + " Space Efficient Solver " + "-" * 10)
 
-optimal_war, time_dp_ms = get_pure_execution_time(
+optimal_war, time_ms, memory_kib = measure_performance(
     compute_optimal_war_with_one_vector, N, X, players, repetitions=15
 )
 print(f"Optimal WAR: {optimal_war:.2f}")
-print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
+print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
+print(f"Picco memoria RAM: {memory_kib:.2f} KiB")
 
 print("\n")
 print("-" * 10 + " Top Down Memoized " + "-" * 10)
 
-optimal_war, time_dp_ms = get_pure_execution_time(
+optimal_war, time_ms, memory_kib = measure_performance(
     compute_optimal_war_with_recursion, N, X, players, repetitions=15
 )
 print(f"Optimal WAR: {optimal_war:.2f}")
-print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
+print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
+print(f"Picco memoria RAM: {memory_kib:.2f} KiB")
 
 # Preparazione candidati filtrati secondo Pareto
 COST_UNIT = 100000
@@ -99,20 +110,22 @@ filtered_players = filter_players(players, COST_UNIT, total_budget)
 print("\n")
 print("-" * 10 + " Bottom Up Solver (Pareto Pruned) " + "-" * 10)
 
-optimal_war, time_dp_ms = get_pure_execution_time(
+optimal_war, time_ms, memory_kib = measure_performance(
     compute_optimal_war_without_s, N, X, filtered_players, repetitions=15
 )
 print(f"Optimal WAR: {optimal_war:.2f}")
-print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
+print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
+print(f"Picco memoria RAM: {memory_kib:.2f} KiB")
 
 print("\n")
 print("-" * 10 + " Space Efficient Solver (Pareto Pruned) " + "-" * 10)
 
-optimal_war, time_dp_ms = get_pure_execution_time(
+optimal_war, time_ms, memory_kib = measure_performance(
     compute_optimal_war_with_one_vector, N, X, filtered_players, repetitions=15
 )
 print(f"Optimal WAR: {optimal_war:.2f}")
-print(f"Tempo computazionale effettivo: {time_dp_ms:.4f} ms")
+print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
+print(f"Picco memoria RAM: {memory_kib:.2f} KiB")
 
 print("\n")
 print("-" * 10 + " Reconstruction Test " + "-" * 10)
