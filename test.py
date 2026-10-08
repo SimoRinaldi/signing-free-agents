@@ -13,6 +13,7 @@ from src.algorithms.time_optimized import compute_optimal_war_with_recursion
 from src.algorithms.filter import filter_players
 import time
 import tracemalloc
+import matplotlib.pyplot as plt
 
 
 def get_pure_execution_time(func, *args, repetitions=10):
@@ -57,11 +58,22 @@ def measure_performance(func, *args, repetitions=10):
     return result, time_ms, peak_kib
 
 
+def get_instance_size(file_path):
+    N, X, players = load_scenario(str(file_path))
+    B = X // 100000
+    P = len(players[0]) if players else 0
+    return N * B * P  # la chiave di ordinamento
+
+
 # ---------------------------------------------------------------------------------
 scenarios_dir = Path("scenarios")
 
-for file_path in sorted(scenarios_dir.glob("*.json")):
+scenarios_names = []
+bottom_up_execution_times = []
+
+for file_path in sorted(scenarios_dir.glob("*.json"), key=get_instance_size):
     print(f"Elaborazione: {file_path.name}")
+    scenarios_names.append(file_path.stem)
 
     N, X, players = load_scenario(str(file_path))
     P = len(players[0]) if players else 0
@@ -76,6 +88,7 @@ for file_path in sorted(scenarios_dir.glob("*.json")):
     print(f"Optimal WAR: {optimal_war:.2f}")
     print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
     print(f"Picco memoria RAM: {memory_kib:.2f} KiB")
+    bottom_up_execution_times.append(time_ms)
 
     print("\n")
     print("-" * 10 + " Bottom Up Solver (solo matrice m) " + "-" * 10)
@@ -167,3 +180,25 @@ for file_path in sorted(scenarios_dir.glob("*.json")):
     print("=" * 90 + "\n")
 
 # -------------------------------------------------------------------------------------------------------------------
+print(bottom_up_execution_times)
+
+plt.figure(figsize=(10, 5))
+plt.plot(
+    scenarios_names,
+    bottom_up_execution_times,
+    marker="o",
+    color="royalblue",
+    linewidth=2,
+)
+
+plt.title("Andamento Tempi di Esecuzione nei Vari Scenari")
+plt.xlabel("Scenario")
+plt.ylabel("Tempo (ms)")
+plt.xticks(rotation=30, ha="right")  # ruota i nomi per non sovrapporli
+plt.grid(True, linestyle="--", alpha=0.6)
+plt.tight_layout()
+
+# Salva il file immagine PNG ad alta risoluzione
+plt.savefig("andamento_tempi_bottom_up.png", dpi=300)
+print("Grafico salvato con successo in 'andamento_tempi_bottom_up.png'!")
+plt.show()
