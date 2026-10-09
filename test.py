@@ -1,9 +1,9 @@
 from pathlib import Path
-import matplotlib.pyplot as plt
 
 from src.core.loader import load_scenario
 from src.benchmark.profiler import PerformanceProfiler
 from src.benchmark.exporter import DataExporter
+from src.benchmark.plotter import PerformancePlotter
 from src.algorithms.optimal_value import (
     compute_optimal_war,
     compute_optimal_war_without_s,
@@ -139,25 +139,8 @@ for file_path in sorted(scenarios_dir.glob("*.json"), key=get_instance_size):
 csv_metrics_path = exporter.export_metrics_to_csv("benchmark_metrics.csv")
 print(f"Tutte le metriche sono state salvate con successo in '{csv_metrics_path}'!\n")
 
-# -------------------------------------------------------------------------------------------------------------------
-print(bottom_up_execution_times)
-
-plt.figure(figsize=(10, 5))
-plt.plot(
-    scenarios_names,
-    bottom_up_execution_times,
-    marker="o",
-    color="royalblue",
-    linewidth=2,
-)
-
-plt.title("Andamento Tempi di Esecuzione nei Vari Scenari")
-plt.xlabel("Scenario")
-plt.ylabel("Tempo (ms)")
-plt.xticks(rotation=30, ha="right")
-plt.grid(True, linestyle="--", alpha=0.6)
-plt.tight_layout()
-
-plt.savefig("andamento_tempi_bottom_up.png", dpi=300)
-print("Grafico salvato con successo in 'andamento_tempi_bottom_up.png'!")
-plt.show()
+# Generazione dei grafici prestazionali
+plotter = PerformancePlotter(show_plots=True)
+generated_plots = plotter.plot_all()
+for p in generated_plots:
+    print(f"Grafico generato con successo: '{p}'")
