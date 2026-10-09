@@ -1,0 +1,227 @@
+{
+  "scenario_name": "scenario_03_N4_B50_P10",
+  "budget": 5000000,
+  "cost_unit": 100000,
+  "roles": [
+    {
+      "role_name": "Starting Pitcher",
+      "candidates": [
+        {
+          "name": "Tarik Skubal",
+          "cost": 1100000,
+          "war": 6.6
+        },
+        {
+          "name": "Zack Wheeler",
+          "cost": 1000000,
+          "war": 6.1
+        },
+        {
+          "name": "Chris Sale",
+          "cost": 1000000,
+          "war": 6.0
+        },
+        {
+          "name": "Paul Skenes",
+          "cost": 900000,
+          "war": 5.9
+        },
+        {
+          "name": "Logan Gilbert",
+          "cost": 900000,
+          "war": 5.5
+        },
+        {
+          "name": "Corbin Burnes",
+          "cost": 800000,
+          "war": 5.2
+        },
+        {
+          "name": "Tyler Glasnow",
+          "cost": 800000,
+          "war": 5.1
+        },
+        {
+          "name": "Dylan Cease",
+          "cost": 800000,
+          "war": 5.0
+        },
+        {
+          "name": "Cole Ragans",
+          "cost": 700000,
+          "war": 4.9
+        },
+        {
+          "name": "Logan Webb",
+          "cost": 700000,
+          "war": 4.8
+        }
+      ]
+    },
+    {
+      "role_name": "Catcher",
+      "candidates": [
+        {
+          "name": "William Contreras",
+          "cost": 700000,
+          "war": 4.9
+        },
+        {
+          "name": "Cal Raleigh",
+          "cost": 700000,
+          "war": 4.6
+        },
+        {
+          "name": "Adley Rutschman",
+          "cost": 800000,
+          "war": 4.0
+        },
+        {
+          "name": "Will Smith (Catcher)",
+          "cost": 800000,
+          "war": 4.0
+        },
+        {
+          "name": "Yainer Diaz",
+          "cost": 600000,
+          "war": 3.8
+        },
+        {
+          "name": "J.T. Realmuto",
+          "cost": 700000,
+          "war": 3.5
+        },
+        {
+          "name": "Salvador Perez",
+          "cost": 600000,
+          "war": 3.2
+        },
+        {
+          "name": "Patrick Bailey",
+          "cost": 500000,
+          "war": 3.1
+        },
+        {
+          "name": "Gabriel Moreno",
+          "cost": 500000,
+          "war": 3.0
+        },
+        {
+          "name": "Sean Murphy",
+          "cost": 600000,
+          "war": 2.8
+        }
+      ]
+    },
+    {
+      "role_name": "First Base",
+      "candidates": [
+        {
+          "name": "Vladimir Guerrero Jr.",
+          "cost": 900000,
+          "war": 5.5
+        },
+        {
+          "name": "Bryce Harper",
+          "cost": 900000,
+          "war": 5.5
+        },
+        {
+          "name": "Freddie Freeman",
+          "cost": 900000,
+          "war": 5.0
+        },
+        {
+          "name": "Christian Walker",
+          "cost": 700000,
+          "war": 3.8
+        },
+        {
+          "name": "Pete Alonso",
+          "cost": 800000,
+          "war": 3.5
+        },
+        {
+          "name": "Josh Naylor",
+          "cost": 600000,
+          "war": 3.0
+        },
+        {
+          "name": "Vinnie Pasquantino",
+          "cost": 500000,
+          "war": 2.8
+        },
+        {
+          "name": "Yandy Diaz",
+          "cost": 600000,
+          "war": 2.6
+        },
+        {
+          "name": "Michael Busch",
+          "cost": 500000,
+          "war": 2.5
+        },
+        {
+          "name": "Ryan Mountcastle",
+          "cost": 500000,
+          "war": 2.4
+        }
+      ]
+    },
+    {
+      "role_name": "Shortstop",
+      "candidates": [
+        {
+          "name": "Bobby Witt Jr.",
+          "cost": 1200000,
+          "war": 9.4
+        },
+        {
+          "name": "Gunnar Henderson",
+          "cost": 1100000,
+          "war": 8.0
+        },
+        {
+          "name": "Francisco Lindor",
+          "cost": 1000000,
+          "war": 7.0
+        },
+        {
+          "name": "Elly De La Cruz",
+          "cost": 900000,
+          "war": 6.5
+        },
+        {
+          "name": "Willy Adames",
+          "cost": 800000,
+          "war": 4.8
+        },
+        {
+          "name": "Corey Seager",
+          "cost": 800000,
+          "war": 4.5
+        },
+        {
+          "name": "Anthony Volpe",
+          "cost": 700000,
+          "war": 4.0
+        },
+        {
+          "name": "Dansby Swanson",
+          "cost": 700000,
+          "war": 3.8
+        },
+        {
+          "name": "Trea Turner",
+          "cost": 700000,
+          "war": 3.8
+        },
+        {
+          "name": "Masyn Winn",
+          "cost": 600000,
+          "war": 3.6
+        }
+      ]
+    }
+  ]
+}

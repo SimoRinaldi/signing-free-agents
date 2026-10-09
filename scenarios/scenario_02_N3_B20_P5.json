@@ -1,0 +1,97 @@
+{
+  "scenario_name": "scenario_02_N3_B20_P5",
+  "budget": 2000000,
+  "cost_unit": 100000,
+  "roles": [
+    {
+      "role_name": "Starting Pitcher",
+      "candidates": [
+        {
+          "name": "Tarik Skubal",
+          "cost": 1100000,
+          "war": 6.6
+        },
+        {
+          "name": "Zack Wheeler",
+          "cost": 1000000,
+          "war": 6.1
+        },
+        {
+          "name": "Chris Sale",
+          "cost": 1000000,
+          "war": 6.0
+        },
+        {
+          "name": "Paul Skenes",
+          "cost": 900000,
+          "war": 5.9
+        },
+        {
+          "name": "Logan Gilbert",
+          "cost": 900000,
+          "war": 5.5
+        }
+      ]
+    },
+    {
+      "role_name": "Catcher",
+      "candidates": [
+        {
+          "name": "William Contreras",
+          "cost": 700000,
+          "war": 4.9
+        },
+        {
+          "name": "Cal Raleigh",
+          "cost": 700000,
+          "war": 4.6
+        },
+        {
+          "name": "Adley Rutschman",
+          "cost": 800000,
+          "war": 4.0
+        },
+        {
+          "name": "Will Smith (Catcher)",
+          "cost": 800000,
+          "war": 4.0
+        },
+        {
+          "name": "Yainer Diaz",
+          "cost": 600000,
+          "war": 3.8
+        }
+      ]
+    },
+    {
+      "role_name": "Shortstop",
+      "candidates": [
+        {
+          "name": "Bobby Witt Jr.",
+          "cost": 1200000,
+          "war": 9.4
+        },
+        {
+          "name": "Gunnar Henderson",
+          "cost": 1100000,
+          "war": 8.0
+        },
+        {
+          "name": "Francisco Lindor",
+          "cost": 1000000,
+          "war": 7.0
+        },
+        {
+          "name": "Elly De La Cruz",
+          "cost": 900000,
+          "war": 6.5
+        },
+        {
+          "name": "Willy Adames",
+          "cost": 800000,
+          "war": 4.8
+        }
+      ]
+    }
+  ]
+}

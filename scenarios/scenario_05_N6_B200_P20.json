@@ -1,0 +1,637 @@
+{
+  "scenario_name": "scenario_05_N6_B200_P20",
+  "budget": 20000000,
+  "cost_unit": 100000,
+  "roles": [
+    {
+      "role_name": "Starting Pitcher",
+      "candidates": [
+        {
+          "name": "Tarik Skubal",
+          "cost": 1100000,
+          "war": 6.6
+        },
+        {
+          "name": "Zack Wheeler",
+          "cost": 1000000,
+          "war": 6.1
+        },
+        {
+          "name": "Chris Sale",
+          "cost": 1000000,
+          "war": 6.0
+        },
+        {
+          "name": "Paul Skenes",
+          "cost": 900000,
+          "war": 5.9
+        },
+        {
+          "name": "Logan Gilbert",
+          "cost": 900000,
+          "war": 5.5
+        },
+        {
+          "name": "Corbin Burnes",
+          "cost": 800000,
+          "war": 5.2
+        },
+        {
+          "name": "Tyler Glasnow",
+          "cost": 800000,
+          "war": 5.1
+        },
+        {
+          "name": "Dylan Cease",
+          "cost": 800000,
+          "war": 5.0
+        },
+        {
+          "name": "Cole Ragans",
+          "cost": 700000,
+          "war": 4.9
+        },
+        {
+          "name": "Logan Webb",
+          "cost": 700000,
+          "war": 4.8
+        },
+        {
+          "name": "George Kirby",
+          "cost": 700000,
+          "war": 4.7
+        },
+        {
+          "name": "Max Fried",
+          "cost": 600000,
+          "war": 4.5
+        },
+        {
+          "name": "Gerrit Cole",
+          "cost": 600000,
+          "war": 4.4
+        },
+        {
+          "name": "Framber Valdez",
+          "cost": 600000,
+          "war": 4.3
+        },
+        {
+          "name": "Pablo Lopez",
+          "cost": 500000,
+          "war": 4.1
+        },
+        {
+          "name": "Sonny Gray",
+          "cost": 500000,
+          "war": 4.0
+        },
+        {
+          "name": "Ronel Blanco",
+          "cost": 400000,
+          "war": 3.8
+        },
+        {
+          "name": "Hunter Greene",
+          "cost": 400000,
+          "war": 3.7
+        },
+        {
+          "name": "Bailey Ober",
+          "cost": 400000,
+          "war": 3.6
+        },
+        {
+          "name": "Cristopher Sanchez",
+          "cost": 300000,
+          "war": 3.3
+        }
+      ]
+    },
+    {
+      "role_name": "Relief Pitcher",
+      "candidates": [
+        {
+          "name": "Emmanuel Clase",
+          "cost": 800000,
+          "war": 4.1
+        },
+        {
+          "name": "Mason Miller",
+          "cost": 500000,
+          "war": 3.0
+        },
+        {
+          "name": "Ryan Helsley",
+          "cost": 600000,
+          "war": 3.2
+        },
+        {
+          "name": "Josh Hader",
+          "cost": 800000,
+          "war": 2.8
+        },
+        {
+          "name": "Raisel Iglesias",
+          "cost": 600000,
+          "war": 2.5
+        },
+        {
+          "name": "Devin Williams",
+          "cost": 500000,
+          "war": 2.2
+        },
+        {
+          "name": "Robert Suarez",
+          "cost": 500000,
+          "war": 2.3
+        },
+        {
+          "name": "Bryan Abreu",
+          "cost": 400000,
+          "war": 2.1
+        },
+        {
+          "name": "Andres Munoz",
+          "cost": 500000,
+          "war": 2.4
+        },
+        {
+          "name": "Jeff Hoffman",
+          "cost": 400000,
+          "war": 2.2
+        },
+        {
+          "name": "Jason Foley",
+          "cost": 300000,
+          "war": 1.8
+        },
+        {
+          "name": "David Robertson",
+          "cost": 400000,
+          "war": 1.5
+        },
+        {
+          "name": "Aroldis Chapman",
+          "cost": 400000,
+          "war": 1.4
+        },
+        {
+          "name": "Pete Fairbanks",
+          "cost": 300000,
+          "war": 1.3
+        },
+        {
+          "name": "Alexis Diaz",
+          "cost": 300000,
+          "war": 1.2
+        },
+        {
+          "name": "Hunter Harvey",
+          "cost": 300000,
+          "war": 1.1
+        },
+        {
+          "name": "Hector Neris",
+          "cost": 300000,
+          "war": 1.1
+        },
+        {
+          "name": "Kyle Finnegan",
+          "cost": 300000,
+          "war": 1.0
+        },
+        {
+          "name": "Craig Kimbrel",
+          "cost": 300000,
+          "war": 0.9
+        },
+        {
+          "name": "Scott Barlow",
+          "cost": 200000,
+          "war": 0.8
+        }
+      ]
+    },
+    {
+      "role_name": "Catcher",
+      "candidates": [
+        {
+          "name": "William Contreras",
+          "cost": 700000,
+          "war": 4.9
+        },
+        {
+          "name": "Cal Raleigh",
+          "cost": 700000,
+          "war": 4.6
+        },
+        {
+          "name": "Adley Rutschman",
+          "cost": 800000,
+          "war": 4.0
+        },
+        {
+          "name": "Will Smith (Catcher)",
+          "cost": 800000,
+          "war": 4.0
+        },
+        {
+          "name": "Yainer Diaz",
+          "cost": 600000,
+          "war": 3.8
+        },
+        {
+          "name": "J.T. Realmuto",
+          "cost": 700000,
+          "war": 3.5
+        },
+        {
+          "name": "Salvador Perez",
+          "cost": 600000,
+          "war": 3.2
+        },
+        {
+          "name": "Patrick Bailey",
+          "cost": 500000,
+          "war": 3.1
+        },
+        {
+          "name": "Gabriel Moreno",
+          "cost": 500000,
+          "war": 3.0
+        },
+        {
+          "name": "Sean Murphy",
+          "cost": 600000,
+          "war": 2.8
+        },
+        {
+          "name": "Alejandro Kirk",
+          "cost": 400000,
+          "war": 2.5
+        },
+        {
+          "name": "Connor Wong",
+          "cost": 400000,
+          "war": 2.2
+        },
+        {
+          "name": "Shea Langeliers",
+          "cost": 400000,
+          "war": 2.3
+        },
+        {
+          "name": "Tyler Stephenson",
+          "cost": 400000,
+          "war": 2.1
+        },
+        {
+          "name": "Jonah Heim",
+          "cost": 400000,
+          "war": 2.0
+        },
+        {
+          "name": "Bo Naylor",
+          "cost": 300000,
+          "war": 1.7
+        },
+        {
+          "name": "Keibert Ruiz",
+          "cost": 300000,
+          "war": 1.5
+        },
+        {
+          "name": "Kyle Higashioka",
+          "cost": 300000,
+          "war": 1.4
+        },
+        {
+          "name": "Elias Diaz",
+          "cost": 200000,
+          "war": 1.2
+        },
+        {
+          "name": "Travis d'Arnaud",
+          "cost": 300000,
+          "war": 1.6
+        }
+      ]
+    },
+    {
+      "role_name": "First Base",
+      "candidates": [
+        {
+          "name": "Vladimir Guerrero Jr.",
+          "cost": 900000,
+          "war": 5.5
+        },
+        {
+          "name": "Bryce Harper",
+          "cost": 900000,
+          "war": 5.5
+        },
+        {
+          "name": "Freddie Freeman",
+          "cost": 900000,
+          "war": 5.0
+        },
+        {
+          "name": "Christian Walker",
+          "cost": 700000,
+          "war": 3.8
+        },
+        {
+          "name": "Pete Alonso",
+          "cost": 800000,
+          "war": 3.5
+        },
+        {
+          "name": "Josh Naylor",
+          "cost": 600000,
+          "war": 3.0
+        },
+        {
+          "name": "Vinnie Pasquantino",
+          "cost": 500000,
+          "war": 2.8
+        },
+        {
+          "name": "Yandy Diaz",
+          "cost": 600000,
+          "war": 2.6
+        },
+        {
+          "name": "Michael Busch",
+          "cost": 500000,
+          "war": 2.5
+        },
+        {
+          "name": "Ryan Mountcastle",
+          "cost": 500000,
+          "war": 2.4
+        },
+        {
+          "name": "Nathaniel Lowe",
+          "cost": 500000,
+          "war": 2.2
+        },
+        {
+          "name": "Triston Casas",
+          "cost": 500000,
+          "war": 2.2
+        },
+        {
+          "name": "Spencer Steer",
+          "cost": 400000,
+          "war": 2.1
+        },
+        {
+          "name": "Rhys Hoskins",
+          "cost": 500000,
+          "war": 2.0
+        },
+        {
+          "name": "Matt Olson",
+          "cost": 700000,
+          "war": 3.6
+        },
+        {
+          "name": "Paul Goldschmidt",
+          "cost": 400000,
+          "war": 1.5
+        },
+        {
+          "name": "Anthony Rizzo",
+          "cost": 400000,
+          "war": 1.1
+        },
+        {
+          "name": "Ty France",
+          "cost": 300000,
+          "war": 1.0
+        },
+        {
+          "name": "Rowdy Tellez",
+          "cost": 200000,
+          "war": 0.8
+        },
+        {
+          "name": "Jose Abreu",
+          "cost": 200000,
+          "war": 0.3
+        }
+      ]
+    },
+    {
+      "role_name": "Shortstop",
+      "candidates": [
+        {
+          "name": "Bobby Witt Jr.",
+          "cost": 1200000,
+          "war": 9.4
+        },
+        {
+          "name": "Gunnar Henderson",
+          "cost": 1100000,
+          "war": 8.0
+        },
+        {
+          "name": "Francisco Lindor",
+          "cost": 1000000,
+          "war": 7.0
+        },
+        {
+          "name": "Elly De La Cruz",
+          "cost": 900000,
+          "war": 6.5
+        },
+        {
+          "name": "Willy Adames",
+          "cost": 800000,
+          "war": 4.8
+        },
+        {
+          "name": "Corey Seager",
+          "cost": 800000,
+          "war": 4.5
+        },
+        {
+          "name": "Anthony Volpe",
+          "cost": 700000,
+          "war": 4.0
+        },
+        {
+          "name": "Dansby Swanson",
+          "cost": 700000,
+          "war": 3.8
+        },
+        {
+          "name": "Trea Turner",
+          "cost": 700000,
+          "war": 3.8
+        },
+        {
+          "name": "Masyn Winn",
+          "cost": 600000,
+          "war": 3.6
+        },
+        {
+          "name": "Ezequiel Tovar",
+          "cost": 600000,
+          "war": 3.5
+        },
+        {
+          "name": "CJ Abrams",
+          "cost": 600000,
+          "war": 3.4
+        },
+        {
+          "name": "Jeremy Pena",
+          "cost": 500000,
+          "war": 3.2
+        },
+        {
+          "name": "Carlos Correa",
+          "cost": 600000,
+          "war": 3.5
+        },
+        {
+          "name": "J.P. Crawford",
+          "cost": 500000,
+          "war": 2.5
+        },
+        {
+          "name": "Orlando Arcia",
+          "cost": 400000,
+          "war": 2.2
+        },
+        {
+          "name": "Zach Neto",
+          "cost": 500000,
+          "war": 3.1
+        },
+        {
+          "name": "Bo Bichette",
+          "cost": 400000,
+          "war": 1.5
+        },
+        {
+          "name": "Trevor Story",
+          "cost": 300000,
+          "war": 1.5
+        },
+        {
+          "name": "Paul DeJong",
+          "cost": 300000,
+          "war": 1.6
+        }
+      ]
+    },
+    {
+      "role_name": "Outfielder",
+      "candidates": [
+        {
+          "name": "Aaron Judge",
+          "cost": 1300000,
+          "war": 10.8
+        },
+        {
+          "name": "Juan Soto",
+          "cost": 1200000,
+          "war": 8.0
+        },
+        {
+          "name": "Jarren Duran",
+          "cost": 1000000,
+          "war": 6.7
+        },
+        {
+          "name": "Brenton Doyle",
+          "cost": 900000,
+          "war": 5.5
+        },
+        {
+          "name": "Jackson Merrill",
+          "cost": 800000,
+          "war": 5.3
+        },
+        {
+          "name": "Riley Greene",
+          "cost": 800000,
+          "war": 5.2
+        },
+        {
+          "name": "Kyle Tucker",
+          "cost": 800000,
+          "war": 5.0
+        },
+        {
+          "name": "Jurickson Profar",
+          "cost": 700000,
+          "war": 4.5
+        },
+        {
+          "name": "Teoscar Hernandez",
+          "cost": 700000,
+          "war": 4.3
+        },
+        {
+          "name": "Steven Kwan",
+          "cost": 700000,
+          "war": 4.0
+        },
+        {
+          "name": "Christian Yelich",
+          "cost": 700000,
+          "war": 3.9
+        },
+        {
+          "name": "Julio Rodriguez",
+          "cost": 700000,
+          "war": 3.8
+        },
+        {
+          "name": "Ian Happ",
+          "cost": 600000,
+          "war": 3.7
+        },
+        {
+          "name": "Seiya Suzuki",
+          "cost": 600000,
+          "war": 3.6
+        },
+        {
+          "name": "Anthony Santander",
+          "cost": 600000,
+          "war": 3.5
+        },
+        {
+          "name": "Brandon Nimmo",
+          "cost": 600000,
+          "war": 3.2
+        },
+        {
+          "name": "Bryan Reynolds",
+          "cost": 600000,
+          "war": 3.0
+        },
+        {
+          "name": "Tyler O'Neill",
+          "cost": 500000,
+          "war": 2.8
+        },
+        {
+          "name": "Lourdes Gurriel Jr.",
+          "cost": 500000,
+          "war": 2.8
+        },
+        {
+          "name": "Cody Bellinger",
+          "cost": 500000,
+          "war": 2.5
+        }
+      ]
+    }
+  ]
+}

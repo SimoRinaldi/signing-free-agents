@@ -9,9 +9,9 @@ class PerformancePlotter:
         self,
         metrics_csv: str = "results/benchmark_metrics.csv",
         output_dir: str = "results",
-        log_optimal_val: bool = True,
-        log_reconstruction: bool = True,
-        log_pareto: bool = True,
+        log_optimal_val: bool = False,
+        log_reconstruction: bool = False,
+        log_pareto: bool = False,
         show_plots: bool = False,
     ):
         self.metrics_csv = Path(metrics_csv)
@@ -67,13 +67,23 @@ class PerformancePlotter:
         ax_time.set_title(f"Tempo di Calcolo Valore Ottimo{scale_text}")
         ax_time.set_xlabel("Dimensione Istanza (N * B * P)")
         ax_time.set_ylabel("Tempo (ms)")
-        ax_time.grid(True, which="both" if self.log_optimal_val else "major", linestyle="--", alpha=0.5)
+        ax_time.grid(
+            True,
+            which="both" if self.log_optimal_val else "major",
+            linestyle="--",
+            alpha=0.5,
+        )
         ax_time.legend()
 
         ax_mem.set_title(f"Occupazione Memoria RAM{scale_text}")
         ax_mem.set_xlabel("Dimensione Tabella (N * B)")
         ax_mem.set_ylabel("Picco Memoria (KiB)")
-        ax_mem.grid(True, which="both" if self.log_optimal_val else "major", linestyle="--", alpha=0.5)
+        ax_mem.grid(
+            True,
+            which="both" if self.log_optimal_val else "major",
+            linestyle="--",
+            alpha=0.5,
+        )
         ax_mem.legend()
 
         plt.tight_layout()
