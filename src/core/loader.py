@@ -22,10 +22,11 @@ def load_scenario_from_json(file_path):
             raise ValueError("Il numero di candidati per ruolo deve essere costante.")
 
         role_players = [
-            Player(name=c["name"], cost=c["cost"], war=c["war"])
-            for c in candidates
+            Player(name=c["name"], cost=c["cost"], war=c["war"]) for c in candidates
         ]
-        roles.append(Role(name=role_item.get("role_name", "Ruolo"), candidates=role_players))
+        roles.append(
+            Role(name=role_item.get("role_name", "Ruolo"), candidates=role_players)
+        )
 
     return Scenario(
         name=scenario_name,
