@@ -2,9 +2,8 @@ from math import floor
 
 
 # Metodo ricorsivo per il calcolo del WAR ottimale
-def compute_optimal_war_with_recursion(N, X, players):
-    COST_UNIT = 100000
-    B = floor(X / COST_UNIT)
+def compute_optimal_war_with_recursion(N, X, players, cost_unit=100000):
+    B = floor(X / cost_unit)
 
     memo = [[-1.0] * (B + 1) for _ in range(N + 1)]
 
@@ -18,7 +17,7 @@ def compute_optimal_war_with_recursion(N, X, players):
         best_war = dp(i - 1, b)
 
         for p in players[i - 1]:
-            c = p.cost // COST_UNIT
+            c = p.cost // cost_unit
 
             if c <= b:
                 candidate_war = dp(i - 1, b - c) + p.war

@@ -2,9 +2,8 @@ from math import floor
 
 
 # Metodo per ricostruire la rosa ottima a partire dalla matrice decisionale s
-def reconstruct_optimal_roster(N, X, players, s):
-    COST_UNIT = 100000
-    b = floor(X / COST_UNIT)
+def reconstruct_optimal_roster(N, X, players, s, cost_unit=100000):
+    b = floor(X / cost_unit)
     signed_players = []
     total_cost = 0
 
@@ -14,15 +13,14 @@ def reconstruct_optimal_roster(N, X, players, s):
             p = players[i - 1][index]
             signed_players.append(p)
             total_cost += p.cost
-            b -= p.cost // COST_UNIT
+            b -= p.cost // cost_unit
 
     return signed_players, total_cost
 
 
 # Metodo per ricostruire la rosa ottima a partire dalla matrice dei valori m
-def reconstruct_optimal_roster_without_s(N, X, players, m):
-    COST_UNIT = 100000
-    b = floor(X / COST_UNIT)
+def reconstruct_optimal_roster_without_s(N, X, players, m, cost_unit=100000):
+    b = floor(X / cost_unit)
     signed_players = []
     total_cost = 0
 
@@ -32,7 +30,7 @@ def reconstruct_optimal_roster_without_s(N, X, players, m):
             continue
 
         for p in players[i - 1]:
-            c = p.cost // COST_UNIT
+            c = p.cost // cost_unit
             if b >= c and abs(m[i - 1][b - c] + p.war - current_war) < 1e-9:
                 signed_players.append(p)
                 total_cost += p.cost

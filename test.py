@@ -1,5 +1,9 @@
-from load_scenario_by_json import load_scenario
 from pathlib import Path
+import time
+import tracemalloc
+import matplotlib.pyplot as plt
+
+from src.core.loader import load_scenario
 from src.algorithms.optimal_value import (
     compute_optimal_war,
     compute_optimal_war_without_s,
@@ -11,9 +15,6 @@ from src.algorithms.optimal_solution import (
 from src.algorithms.space_optimized import compute_optimal_war_with_one_vector
 from src.algorithms.time_optimized import compute_optimal_war_with_recursion
 from src.algorithms.filter import filter_players
-import time
-import tracemalloc
-import matplotlib.pyplot as plt
 
 
 def get_pure_execution_time(func, *args, repetitions=10):
@@ -59,10 +60,7 @@ def measure_performance(func, *args, repetitions=10):
 
 
 def get_instance_size(file_path):
-    N, X, players = load_scenario(str(file_path))
-    B = X // 100000
-    P = len(players[0]) if players else 0
-    return N * B * P  # la chiave di ordinamento
+    return load_scenario(file_path).instance_size
 
 
 # ---------------------------------------------------------------------------------
@@ -75,15 +73,17 @@ for file_path in sorted(scenarios_dir.glob("*.json"), key=get_instance_size):
     print(f"Elaborazione: {file_path.name}")
     scenarios_names.append(file_path.stem)
 
-    N, X, players = load_scenario(str(file_path))
-    P = len(players[0]) if players else 0
+    scenario = load_scenario(file_path)
+    N, X, players = scenario.N, scenario.budget, scenario.get_players_matrix()
+    cost_unit = scenario.cost_unit
+    P = scenario.P
     print(f"Scenario caricato con successo! N: {N}, X: {X}, P: {P}")
 
     print("\n")
     print("-" * 10 + " Bottom Up Solver (con tabella s) " + "-" * 10)
 
     optimal_war, time_ms, memory_kib = measure_performance(
-        compute_optimal_war, N, X, players, repetitions=15
+        compute_optimal_war, N, X, players, cost_unit, repetitions=15
     )
     print(f"Optimal WAR: {optimal_war:.2f}")
     print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
@@ -94,7 +94,7 @@ for file_path in sorted(scenarios_dir.glob("*.json"), key=get_instance_size):
     print("-" * 10 + " Bottom Up Solver (solo matrice m) " + "-" * 10)
 
     optimal_war, time_ms, memory_kib = measure_performance(
-        compute_optimal_war_without_s, N, X, players, repetitions=15
+        compute_optimal_war_without_s, N, X, players, cost_unit, repetitions=15
     )
     print(f"Optimal WAR: {optimal_war:.2f}")
     print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
@@ -104,7 +104,7 @@ for file_path in sorted(scenarios_dir.glob("*.json"), key=get_instance_size):
     print("-" * 10 + " Space Efficient Solver " + "-" * 10)
 
     optimal_war, time_ms, memory_kib = measure_performance(
-        compute_optimal_war_with_one_vector, N, X, players, repetitions=15
+        compute_optimal_war_with_one_vector, N, X, players, cost_unit, repetitions=15
     )
     print(f"Optimal WAR: {optimal_war:.2f}")
     print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
@@ -114,22 +114,20 @@ for file_path in sorted(scenarios_dir.glob("*.json"), key=get_instance_size):
     print("-" * 10 + " Top Down Memoized " + "-" * 10)
 
     optimal_war, time_ms, memory_kib = measure_performance(
-        compute_optimal_war_with_recursion, N, X, players, repetitions=15
+        compute_optimal_war_with_recursion, N, X, players, cost_unit, repetitions=15
     )
     print(f"Optimal WAR: {optimal_war:.2f}")
     print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
     print(f"Picco memoria RAM: {memory_kib:.2f} KiB")
 
     # Preparazione candidati filtrati secondo Pareto
-    COST_UNIT = 100000
-    total_budget = X // COST_UNIT
-    filtered_players = filter_players(players, COST_UNIT, total_budget)
+    filtered_players = filter_players(players, cost_unit, scenario.B)
 
     print("\n")
     print("-" * 10 + " Bottom Up Solver (Pareto Pruned) " + "-" * 10)
 
     optimal_war, time_ms, memory_kib = measure_performance(
-        compute_optimal_war_without_s, N, X, filtered_players, repetitions=15
+        compute_optimal_war_without_s, N, X, filtered_players, cost_unit, repetitions=15
     )
     print(f"Optimal WAR: {optimal_war:.2f}")
     print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
@@ -139,7 +137,7 @@ for file_path in sorted(scenarios_dir.glob("*.json"), key=get_instance_size):
     print("-" * 10 + " Space Efficient Solver (Pareto Pruned) " + "-" * 10)
 
     optimal_war, time_ms, memory_kib = measure_performance(
-        compute_optimal_war_with_one_vector, N, X, filtered_players, repetitions=15
+        compute_optimal_war_with_one_vector, N, X, filtered_players, cost_unit, repetitions=15
     )
     print(f"Optimal WAR: {optimal_war:.2f}")
     print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
@@ -149,8 +147,8 @@ for file_path in sorted(scenarios_dir.glob("*.json"), key=get_instance_size):
     print("-" * 10 + " Reconstruction Test " + "-" * 10)
 
     # Ricostruzione con matrice decisionale s (approccio classico)
-    optimal_war_s, s = compute_optimal_war(N, X, players)
-    signed_players_s, cost_s = reconstruct_optimal_roster(N, X, players, s)
+    optimal_war_s, s = compute_optimal_war(N, X, players, cost_unit)
+    signed_players_s, cost_s = reconstruct_optimal_roster(N, X, players, s, cost_unit)
     print(
         f"Roster ricostruito tramite matrice s (Costo: {cost_s}, Giocatori: {len(signed_players_s)}):"
     )
@@ -158,8 +156,8 @@ for file_path in sorted(scenarios_dir.glob("*.json"), key=get_instance_size):
         print(f"  - {p.name}: {p.war} WAR (costo: {p.cost})")
 
     # Ricostruzione diretta da matrice valori m (senza s, -50% RAM)
-    optimal_war_m, m = compute_optimal_war_without_s(N, X, players)
-    signed_players_m, cost_m = reconstruct_optimal_roster_without_s(N, X, players, m)
+    optimal_war_m, m = compute_optimal_war_without_s(N, X, players, cost_unit)
+    signed_players_m, cost_m = reconstruct_optimal_roster_without_s(N, X, players, m, cost_unit)
     print(
         f"\nRoster ricostruito tramite matrice m senza s (Costo: {cost_m}, Giocatori: {len(signed_players_m)}):"
     )
@@ -167,9 +165,9 @@ for file_path in sorted(scenarios_dir.glob("*.json"), key=get_instance_size):
         print(f"  - {p.name}: {p.war} WAR (costo: {p.cost})")
 
     # Ricostruzione con matrice m e Pruning di Pareto
-    optimal_war_p, m_p = compute_optimal_war_without_s(N, X, filtered_players)
+    optimal_war_p, m_p = compute_optimal_war_without_s(N, X, filtered_players, cost_unit)
     signed_players_p, cost_p = reconstruct_optimal_roster_without_s(
-        N, X, filtered_players, m_p
+        N, X, filtered_players, m_p, cost_unit
     )
     print(
         f"\nRoster ricostruito tramite matrice m (Pareto Pruned) (Costo: {cost_p}, Giocatori: {len(signed_players_p)}):"
