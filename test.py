@@ -1,9 +1,8 @@
 from pathlib import Path
-import time
-import tracemalloc
 import matplotlib.pyplot as plt
 
 from src.core.loader import load_scenario
+from src.benchmark.profiler import PerformanceProfiler
 from src.algorithms.optimal_value import (
     compute_optimal_war,
     compute_optimal_war_without_s,
@@ -17,54 +16,13 @@ from src.algorithms.time_optimized import compute_optimal_war_with_recursion
 from src.algorithms.filter import filter_players
 
 
-def get_pure_execution_time(func, *args, repetitions=10):
-    times = []
-    result = None
-    for i in range(repetitions):
-        start = time.perf_counter()
-        current_result = func(*args)
-        end = time.perf_counter()
-
-        times.append((end - start) * 1000)
-
-        if i == 0:
-            result = current_result
-
-    min_time_ms = min(times)
-    if isinstance(result, tuple):
-        result = result[0]
-    return result, min_time_ms
-
-
-def get_peak_memory(func, *args):
-    """Misura il picco di memoria RAM allocata con una singola esecuzione dedicata."""
-    tracemalloc.start()
-    tracemalloc.reset_peak()
-
-    result = func(*args)
-
-    _, peak_bytes = tracemalloc.get_traced_memory()
-    tracemalloc.stop()
-
-    if isinstance(result, tuple):
-        result = result[0]
-
-    peak_kib = peak_bytes / 1024
-    return result, peak_kib
-
-
-def measure_performance(func, *args, repetitions=10):
-    result, time_ms = get_pure_execution_time(func, *args, repetitions=repetitions)
-    _, peak_kib = get_peak_memory(func, *args)
-    return result, time_ms, peak_kib
-
-
 def get_instance_size(file_path):
     return load_scenario(file_path).instance_size
 
 
 # ---------------------------------------------------------------------------------
 scenarios_dir = Path("scenarios")
+profiler = PerformanceProfiler(repetitions=15)
 
 scenarios_names = []
 bottom_up_execution_times = []
@@ -82,8 +40,8 @@ for file_path in sorted(scenarios_dir.glob("*.json"), key=get_instance_size):
     print("\n")
     print("-" * 10 + " Bottom Up Solver (con tabella s) " + "-" * 10)
 
-    optimal_war, time_ms, memory_kib = measure_performance(
-        compute_optimal_war, N, X, players, cost_unit, repetitions=15
+    optimal_war, time_ms, memory_kib = profiler.profile(
+        compute_optimal_war, N, X, players, cost_unit
     )
     print(f"Optimal WAR: {optimal_war:.2f}")
     print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
@@ -93,8 +51,8 @@ for file_path in sorted(scenarios_dir.glob("*.json"), key=get_instance_size):
     print("\n")
     print("-" * 10 + " Bottom Up Solver (solo matrice m) " + "-" * 10)
 
-    optimal_war, time_ms, memory_kib = measure_performance(
-        compute_optimal_war_without_s, N, X, players, cost_unit, repetitions=15
+    optimal_war, time_ms, memory_kib = profiler.profile(
+        compute_optimal_war_without_s, N, X, players, cost_unit
     )
     print(f"Optimal WAR: {optimal_war:.2f}")
     print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
@@ -103,8 +61,8 @@ for file_path in sorted(scenarios_dir.glob("*.json"), key=get_instance_size):
     print("\n")
     print("-" * 10 + " Space Efficient Solver " + "-" * 10)
 
-    optimal_war, time_ms, memory_kib = measure_performance(
-        compute_optimal_war_with_one_vector, N, X, players, cost_unit, repetitions=15
+    optimal_war, time_ms, memory_kib = profiler.profile(
+        compute_optimal_war_with_one_vector, N, X, players, cost_unit
     )
     print(f"Optimal WAR: {optimal_war:.2f}")
     print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
@@ -113,8 +71,8 @@ for file_path in sorted(scenarios_dir.glob("*.json"), key=get_instance_size):
     print("\n")
     print("-" * 10 + " Top Down Memoized " + "-" * 10)
 
-    optimal_war, time_ms, memory_kib = measure_performance(
-        compute_optimal_war_with_recursion, N, X, players, cost_unit, repetitions=15
+    optimal_war, time_ms, memory_kib = profiler.profile(
+        compute_optimal_war_with_recursion, N, X, players, cost_unit
     )
     print(f"Optimal WAR: {optimal_war:.2f}")
     print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
@@ -126,8 +84,8 @@ for file_path in sorted(scenarios_dir.glob("*.json"), key=get_instance_size):
     print("\n")
     print("-" * 10 + " Bottom Up Solver (Pareto Pruned) " + "-" * 10)
 
-    optimal_war, time_ms, memory_kib = measure_performance(
-        compute_optimal_war_without_s, N, X, filtered_players, cost_unit, repetitions=15
+    optimal_war, time_ms, memory_kib = profiler.profile(
+        compute_optimal_war_without_s, N, X, filtered_players, cost_unit
     )
     print(f"Optimal WAR: {optimal_war:.2f}")
     print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
@@ -136,8 +94,8 @@ for file_path in sorted(scenarios_dir.glob("*.json"), key=get_instance_size):
     print("\n")
     print("-" * 10 + " Space Efficient Solver (Pareto Pruned) " + "-" * 10)
 
-    optimal_war, time_ms, memory_kib = measure_performance(
-        compute_optimal_war_with_one_vector, N, X, filtered_players, cost_unit, repetitions=15
+    optimal_war, time_ms, memory_kib = profiler.profile(
+        compute_optimal_war_with_one_vector, N, X, filtered_players, cost_unit
     )
     print(f"Optimal WAR: {optimal_war:.2f}")
     print(f"Tempo computazionale effettivo: {time_ms:.4f} ms")
