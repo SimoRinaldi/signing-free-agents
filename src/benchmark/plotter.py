@@ -200,9 +200,94 @@ class PerformancePlotter:
         plt.close(fig)
         return save_path
 
-    # Genera tutti i grafici
+    # Genera una tabella grafica di riepilogo comparativo tra gli algoritmi
+    def plot_comparison_table(self):
+        df = self.load_data()
+        scenarios = df["scenario"].unique()
+
+        algo_abbr = {
+            "Bottom Up Solver (con tabella s)": "BU (con s)",
+            "Bottom Up Solver (solo matrice m)": "BU (senza s)",
+            "Space Efficient Solver": "Space Eff.",
+            "Top Down Memoized": "Top Down",
+            "Bottom Up Solver (Pareto Pruned)": "BU (Pareto)",
+            "Space Efficient Solver (Pareto Pruned)": "Space (Pareto)",
+        }
+
+        col_labels = [
+            "Scenario",
+            "N",
+            "B",
+            "P",
+            "BU (con s)\nTime | Mem",
+            "BU (senza s)\nTime | Mem",
+            "Space Eff.\nTime | Mem",
+            "Top Down\nTime | Mem",
+            "BU (Pareto)\nTime | Mem",
+            "Space (Pareto)\nTime | Mem",
+        ]
+
+        table_data = []
+        for sc in scenarios:
+            sub = df[df["scenario"] == sc]
+            first = sub.iloc[0]
+            row = [
+                sc.replace("scenario_", "sc_"),
+                str(int(first["N"])),
+                str(int(first["B"])),
+                str(int(first["P"])),
+            ]
+            for algo_full in algo_abbr.keys():
+                algo_row = sub[sub["algorithm"] == algo_full]
+                if not algo_row.empty:
+                    t = algo_row.iloc[0]["time_ms"]
+                    m = algo_row.iloc[0]["memory_kib"]
+                    t_str = f"{t:.2f} ms" if t >= 1.0 else f"{t:.3f} ms"
+                    m_str = f"{m:.1f} KiB" if m >= 1.0 else f"{m:.2f} KiB"
+                    row.append(f"{t_str}\n{m_str}")
+                else:
+                    row.append("-")
+            table_data.append(row)
+
+        fig, ax = plt.subplots(figsize=(16, 8))
+        ax.axis("off")
+        ax.set_title(
+            "Tabella Comparativa Prestazioni Algoritmi (Tempo & Memoria RAM)",
+            fontsize=14,
+            weight="bold",
+            pad=20,
+        )
+
+        table = ax.table(
+            cellText=table_data,
+            colLabels=col_labels,
+            cellLoc="center",
+            loc="center",
+        )
+        table.auto_set_font_size(False)
+        table.set_fontsize(9)
+        table.scale(1.0, 2.0)
+
+        # Stile testata e celle
+        for (r, c), cell in table.get_celld().items():
+            if r == 0:
+                cell.set_facecolor("#2c3e50")
+                cell.get_text().set_color("white")
+            elif r % 2 == 0:
+                cell.set_facecolor("#f8f9fa")
+
+        plt.tight_layout()
+        save_path = self.output_dir / "table_algorithms_comparison.png"
+        plt.savefig(save_path, dpi=300, bbox_inches="tight")
+        if self.show_plots:
+            plt.show()
+        plt.close(fig)
+        return save_path
+
+    # Genera tutti i grafici e la tabella
     def plot_all(self):
         p1 = self.plot_optimal_value_comparison()
         p2 = self.plot_reconstruction_comparison()
         p3 = self.plot_pareto_impact()
-        return [p1, p2, p3]
+        p4 = self.plot_comparison_table()
+        return [p1, p2, p3, p4]
