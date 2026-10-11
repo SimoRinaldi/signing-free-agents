@@ -31,9 +31,10 @@ class PerformancePlotter:
     def plot_optimal_value_comparison(self):
         df = self.load_data()
         target_algos = [
-            ("Bottom Up Solver (solo matrice m)", "royalblue", "o"),
-            ("Space Efficient Solver", "forestgreen", "s"),
-            ("Top Down Memoized", "darkorange", "^"),
+            ("Bottom Up (matrice m)", "royalblue", "o"),
+            ("Bottom Up (matrice m, filtro)", "firebrick", "*"),
+            ("Bottom Up (vettore)", "forestgreen", "s"),
+            ("Top Down", "darkorange", "^"),
         ]
 
         fig, (ax_time, ax_mem) = plt.subplots(1, 2, figsize=(14, 5))
@@ -147,71 +148,18 @@ class PerformancePlotter:
         plt.close(fig)
         return save_path
 
-    # Grafico 3: Impatto del filtro di Pareto sui tempi di esecuzione
-    def plot_pareto_impact(self):
-        df = self.load_data()
-        fig, ax = plt.subplots(figsize=(8, 5))
-
-        base_bu = df[
-            df["algorithm"] == "Bottom Up Solver (solo matrice m)"
-        ].sort_values("instance_size")
-        pareto_bu = df[
-            df["algorithm"] == "Bottom Up Solver (Pareto Pruned)"
-        ].sort_values("instance_size")
-
-        ax.plot(
-            base_bu["instance_size"],
-            base_bu["time_ms"],
-            label="Bottom Up (Senza Pareto)",
-            color="royalblue",
-            marker="o",
-            linewidth=2,
-        )
-        ax.plot(
-            pareto_bu["instance_size"],
-            pareto_bu["time_ms"],
-            label="Bottom Up (Pareto Pruned)",
-            color="mediumseagreen",
-            marker="^",
-            linewidth=2,
-        )
-
-        if self.log_pareto:
-            ax.set_xscale("log")
-            ax.set_yscale("log")
-
-        scale_text = " (Scala Log-Log)" if self.log_pareto else ""
-        ax.set_title(f"Impatto del Preprocessing di Pareto sul Tempo{scale_text}")
-        ax.set_xlabel("Dimensione Istanza (N * B * P)")
-        ax.set_ylabel("Tempo (ms)")
-        ax.grid(
-            True,
-            which="both" if self.log_pareto else "major",
-            linestyle="--",
-            alpha=0.5,
-        )
-        ax.legend()
-
-        plt.tight_layout()
-        save_path = self.output_dir / "plot_pareto_impact.png"
-        plt.savefig(save_path, dpi=300)
-        if self.show_plots:
-            plt.show()
-        plt.close(fig)
-        return save_path
-
     # Genera una tabella grafica di riepilogo comparativo tra gli algoritmi
     def plot_comparison_table(self):
         df = self.load_data()
         scenarios = df["scenario"].unique()
 
         algo_abbr = {
-            "Bottom Up Solver (con tabella s)": "BU (con s)",
-            "Bottom Up Solver (solo matrice m)": "BU (senza s)",
-            "Space Efficient Solver": "Space Eff.",
-            "Top Down Memoized": "Top Down",
-            "Bottom Up Solver (Pareto Pruned)": "BU (Pareto)",
-            "Space Efficient Solver (Pareto Pruned)": "Space (Pareto)",
+            "Bottom Up (matrice s)": "BU (con s)",
+            "Bottom Up (matrice m)": "BU (senza s)",
+            "Bottom Up (vettore)": "BU (vettore)",
+            "Top Down": "Top Down",
+            "Bottom Up (matrice m, filtro)": "BU (filtro)",
+            "Bottom Up (vettore, filtro)": "BU (vettore, filtro)",
         }
 
         col_labels = [
@@ -221,10 +169,10 @@ class PerformancePlotter:
             "P",
             "BU (con s)\nTime | Mem",
             "BU (senza s)\nTime | Mem",
-            "Space Eff.\nTime | Mem",
+            "BU (vettore)\nTime | Mem",
             "Top Down\nTime | Mem",
-            "BU (Pareto)\nTime | Mem",
-            "Space (Pareto)\nTime | Mem",
+            "BU (filtro)\nTime | Mem",
+            "BU (vettore, filtro)\nTime | Mem",
         ]
 
         table_data = []
@@ -288,6 +236,5 @@ class PerformancePlotter:
     def plot_all(self):
         p1 = self.plot_optimal_value_comparison()
         p2 = self.plot_reconstruction_comparison()
-        p3 = self.plot_pareto_impact()
-        p4 = self.plot_comparison_table()
-        return [p1, p2, p3, p4]
+        p3 = self.plot_comparison_table()
+        return [p1, p2, p3]

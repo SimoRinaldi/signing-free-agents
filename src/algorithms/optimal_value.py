@@ -5,8 +5,8 @@ from math import floor
 def compute_optimal_war(N, X, players, cost_unit=100000):
     B = floor(X / cost_unit)
 
-    m = [[0.0] * (B + 1) for _ in range(N + 1)]
-    s = [[-1] * (B + 1) for _ in range(N + 1)]
+    m = [[0.0 for _ in range(B + 1)] for _ in range(N + 1)]
+    s = [[-1 for _ in range(B + 1)] for _ in range(N + 1)]
 
     for i in range(1, N + 1):
         m[i][:] = m[i - 1][:]
@@ -29,7 +29,7 @@ def compute_optimal_war(N, X, players, cost_unit=100000):
 def compute_optimal_war_without_s(N, X, players, cost_unit=100000):
     B = floor(X / cost_unit)
 
-    m = [[0.0] * (B + 1) for _ in range(N + 1)]
+    m = [[0.0 for _ in range(B + 1)] for _ in range(N + 1)]
 
     for i in range(1, N + 1):
         m[i][:] = m[i - 1][:]

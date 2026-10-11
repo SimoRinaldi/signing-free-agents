@@ -5,13 +5,13 @@ from math import floor
 def compute_optimal_war_with_recursion(N, X, players, cost_unit=100000):
     B = floor(X / cost_unit)
 
-    memo = [[-1.0] * (B + 1) for _ in range(N + 1)]
+    memo = [[float(-b - 1) for b in range(B + 1)] for _ in range(N + 1)]
 
     def dp(i, b):
         if i == 0:
             return 0.0
 
-        if memo[i][b] != -1.0:
+        if memo[i][b] >= 0:
             return memo[i][b]
 
         best_war = dp(i - 1, b)

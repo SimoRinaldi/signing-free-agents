@@ -45,21 +45,21 @@ def main():
         filtered_players = filter_players(players, cost_unit, scenario.B)
 
         solvers = [
-            ("Bottom Up Solver (con tabella s)", compute_optimal_war, players),
+            ("Bottom Up (matrice s)", compute_optimal_war, players),
             (
-                "Bottom Up Solver (solo matrice m)",
+                "Bottom Up (matrice m)",
                 compute_optimal_war_without_s,
                 players,
             ),
-            ("Space Efficient Solver", compute_optimal_war_with_one_vector, players),
-            ("Top Down Memoized", compute_optimal_war_with_recursion, players),
+            ("Bottom Up (vettore)", compute_optimal_war_with_one_vector, players),
+            ("Top Down", compute_optimal_war_with_recursion, players),
             (
-                "Bottom Up Solver (Pareto Pruned)",
+                "Bottom Up (matrice m, filtro)",
                 compute_optimal_war_without_s,
                 filtered_players,
             ),
             (
-                "Space Efficient Solver (Pareto Pruned)",
+                "Bottom Up (vettore, filtro)",
                 compute_optimal_war_with_one_vector,
                 filtered_players,
             ),

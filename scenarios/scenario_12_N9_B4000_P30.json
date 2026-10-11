@@ -1,6 +1,6 @@
 {
-  "scenario_name": "scenario_08_N9_B1000_P35",
-  "budget": 100000000,
+  "scenario_name": "scenario_12_N9_B4000_P30",
+  "budget": 400000000,
   "cost_unit": 100000,
   "roles": [
     {
@@ -155,31 +155,6 @@
           "name": "Patrick Corbin",
           "cost": 100000,
           "war": 0.9
-        },
-        {
-          "name": "Martin Perez",
-          "cost": 100000,
-          "war": 0.8
-        },
-        {
-          "name": "Cal Quantrill",
-          "cost": 100000,
-          "war": 0.7
-        },
-        {
-          "name": "Griffin Canning",
-          "cost": 100000,
-          "war": 0.6
-        },
-        {
-          "name": "Ross Stripling",
-          "cost": 100000,
-          "war": 0.5
-        },
-        {
-          "name": "Jose Urena",
-          "cost": 100000,
-          "war": 0.4
         }
       ]
     },
@@ -335,31 +310,6 @@
           "name": "Lucas Erceg",
           "cost": 300000,
           "war": 1.7
-        },
-        {
-          "name": "Tyler Kinley",
-          "cost": 200000,
-          "war": 0.9
-        },
-        {
-          "name": "Justin Martinez",
-          "cost": 300000,
-          "war": 1.6
-        },
-        {
-          "name": "Seranthony Dominguez",
-          "cost": 200000,
-          "war": 1.2
-        },
-        {
-          "name": "Griffin Jax",
-          "cost": 400000,
-          "war": 2.1
-        },
-        {
-          "name": "Yennier Cano",
-          "cost": 300000,
-          "war": 1.5
         }
       ]
     },
@@ -515,31 +465,6 @@
           "name": "Victor Caratini",
           "cost": 200000,
           "war": 1.3
-        },
-        {
-          "name": "Christian Vazquez",
-          "cost": 200000,
-          "war": 1.0
-        },
-        {
-          "name": "Luke Maile",
-          "cost": 100000,
-          "war": 0.6
-        },
-        {
-          "name": "Jacob Stallings",
-          "cost": 200000,
-          "war": 1.2
-        },
-        {
-          "name": "Eric Haase",
-          "cost": 100000,
-          "war": 0.7
-        },
-        {
-          "name": "Miguel Amaya",
-          "cost": 200000,
-          "war": 1.0
         }
       ]
     },
@@ -695,31 +620,6 @@
           "name": "Joey Meneses",
           "cost": 200000,
           "war": 0.9
-        },
-        {
-          "name": "Harold Ramirez",
-          "cost": 200000,
-          "war": 1.1
-        },
-        {
-          "name": "Cavan Biggio",
-          "cost": 200000,
-          "war": 0.9
-        },
-        {
-          "name": "Garrett Cooper",
-          "cost": 200000,
-          "war": 0.8
-        },
-        {
-          "name": "J.D. Davis",
-          "cost": 200000,
-          "war": 1.0
-        },
-        {
-          "name": "Dominic Smith",
-          "cost": 200000,
-          "war": 1.0
         }
       ]
     },
@@ -875,31 +775,6 @@
           "name": "Luis Rengifo",
           "cost": 300000,
           "war": 1.8
-        },
-        {
-          "name": "David Hamilton",
-          "cost": 300000,
-          "war": 1.6
-        },
-        {
-          "name": "Isiah Kiner-Falefa",
-          "cost": 400000,
-          "war": 2.3
-        },
-        {
-          "name": "Zach McKinstry",
-          "cost": 200000,
-          "war": 1.1
-        },
-        {
-          "name": "Willi Castro",
-          "cost": 400000,
-          "war": 2.5
-        },
-        {
-          "name": "Jose Caballero",
-          "cost": 300000,
-          "war": 1.9
         }
       ]
     },
@@ -1055,31 +930,6 @@
           "name": "Ramon Urias",
           "cost": 300000,
           "war": 1.6
-        },
-        {
-          "name": "Jace Peterson",
-          "cost": 100000,
-          "war": 0.5
-        },
-        {
-          "name": "Brian Anderson",
-          "cost": 100000,
-          "war": 0.6
-        },
-        {
-          "name": "Eduardo Escobar",
-          "cost": 100000,
-          "war": 0.5
-        },
-        {
-          "name": "Evan Longoria",
-          "cost": 100000,
-          "war": 0.6
-        },
-        {
-          "name": "Mike Moustakas",
-          "cost": 100000,
-          "war": 0.4
         }
       ]
     },
@@ -1235,31 +1085,6 @@
           "name": "Nick Ahmed",
           "cost": 100000,
           "war": 0.6
-        },
-        {
-          "name": "Amed Rosario",
-          "cost": 200000,
-          "war": 1.1
-        },
-        {
-          "name": "Elvis Andrus",
-          "cost": 100000,
-          "war": 0.5
-        },
-        {
-          "name": "Jose Iglesias",
-          "cost": 200000,
-          "war": 1.4
-        },
-        {
-          "name": "Alcides Escobar",
-          "cost": 100000,
-          "war": 0.4
-        },
-        {
-          "name": "Andrelton Simmons",
-          "cost": 100000,
-          "war": 0.4
         }
       ]
     },
@@ -1415,31 +1240,6 @@
           "name": "James Wood",
           "cost": 500000,
           "war": 2.7
-        },
-        {
-          "name": "Cedric Mullins",
-          "cost": 400000,
-          "war": 2.2
-        },
-        {
-          "name": "Pete Crow-Armstrong",
-          "cost": 500000,
-          "war": 2.9
-        },
-        {
-          "name": "Taylor Ward",
-          "cost": 400000,
-          "war": 2.5
-        },
-        {
-          "name": "Wilyer Abreu",
-          "cost": 500000,
-          "war": 3.0
-        },
-        {
-          "name": "Sal Frelick",
-          "cost": 400000,
-          "war": 2.2
         }
       ]
     },
@@ -1595,31 +1395,6 @@
           "name": "Jesus Aguilar",
           "cost": 100000,
           "war": 0.4
-        },
-        {
-          "name": "Darin Ruf",
-          "cost": 100000,
-          "war": 0.4
-        },
-        {
-          "name": "Rowdy Tellez",
-          "cost": 100000,
-          "war": 0.7
-        },
-        {
-          "name": "Garrett Cooper",
-          "cost": 100000,
-          "war": 0.6
-        },
-        {
-          "name": "Willie Calhoun",
-          "cost": 100000,
-          "war": 0.6
-        },
-        {
-          "name": "Franmil Reyes",
-          "cost": 100000,
-          "war": 0.5
         }
       ]
     }
