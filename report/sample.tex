@@ -1,0 +1,217 @@
+% Template last modified by Jake Hart; please contact course staff if you have any questions regarding using this template
+
+\documentclass{cisXXX} % You must have the cisXXX .cls file in your project or working directory (i.e. the same directory as this document) 
+
+\HWauthor{Simone Rinaldi 737270}{s.rinaldi012@studenti.unibs.it} % Put your name and Penn email on this line
+% \HWno{} % Enter the number of the homework you are working on
+\HWcourse{Algoritmi e Strutture Dati} % Enter the course department and number here
+\date{Elaborato a.a. 2025/26 \\[0.3em] Prof.ssa Marina Zanella}
+% \HWpartner{} % If your class allows group work, put your partners here
+% \HWpartner{Amelia Earhart} % Otherwise, delete or comment these lines 
+
+\usepackage{amsmath}
+\usepackage{amssymb}                                                                                                                    
+\usepackage[italian]{babel}
+
+\begin{document}
+\maketitle
+
+\section*{Compito 1}                                                                           
+\subsection{Descrizione del problema}                                                                                                                                                                               
+Il problema affrontato in questo elaborato consiste nell'ottimizzazione dell'ingaggio di giocatori per una squadra sportiva a budget      
+limitato. Tale formulazione modella il tipico scenario decisionale affrontato dalla dirigenza di un club durante una sessione di            
+calciomercato: la necessità di comporre la rosa più competitiva possibile rispettando vincoli di bilancio e di copertura dei ruoli.         
+																																			
+In letteratura accademica, il problema è tratto dal testo di riferimento \textit{Introduction to Algorithms} (T.~H.~Cormen, C.~E.         
+~Leiserson, R.~L.~Rivest, C.~Stein), in particolare dal Problema 15-12 (``Signing free-agent baseball players'') presente nel capitolo      
+dedicato alla programmazione dinamica. Nella teoria dell'ottimizzazione combinatoria e della ricerca operativa, tale problema costituisce   
+un'istanza canonica del Multiple-Choice Knapsack Problem (MCKP), variante specializzata del classico problema dello zaino (0/1 Knapsack) in 
+cui gli oggetti sono partizionati in classi disgiunte e mutualmente esclusive.
+
+\subsection{Formulazione Matematica dell'Input}                                                                                           
+                                                                                                                                              
+    L'istanza del problema riceve in ingresso un insieme strutturato di dati discreti e deterministici:                                       
+                                                                                                                                              
+    \begin{itemize}                                                                                                                           
+        \item \textbf{Budget Totale ($B$):} un intero non negativo $B \in \mathbb{N}$ che rappresenta la disponibilità finanziaria massima    
+  spendibile per l'ingaggio complessivo dei componenti della squadra.                                                                         
+        \item \textbf{Numero di Ruoli ($N$):} un intero positivo $N \in \mathbb{N}$ che definisce il numero complessivo di ruoli/reparti      
+  tecnici necessari alla formazione della squadra (es. portiere, difensore, centrocampista, attaccante). I ruoli sono indicizzati da $i = 1, 2,
+  \dots, N$.                                                                                                                                  
+        \item \textbf{Candidati per Ruolo ($P_i$):} per ciascun ruolo $i \in \{1, \dots, N\}$, è disponibile sul mercato un insieme finito di 
+  $P_i$ candidati svincolati, indicizzati con $k \in \{1, 2, \dots, P_i\}$.                                                                   
+        \item \textbf{Parametri dei Giocatori:} ogni candidato $k$ appartenente al ruolo $i$ è univocamente caratterizzato da una coppia di   
+  parametri non negativi:                                                                                                                     
+        \begin{itemize}                                                                                                                       
+            \item $c_{i,k} \in \mathbb{N}$: costo d'acquisto/ingaggio del giocatore.                                                          
+            \item $v_{i,k} \in \mathbb{R}^+$ (o $\mathbb{N}$): valore tecnico atteso o metrica di rendimento del giocatore (corrispondente al 
+  parametro VORP -- \textit{Value Over Replacement Player} del testo di Cormen).                                                              
+        \end{itemize}                                                                                                                         
+    \end{itemize}                                                                                                                             
+                                                                                                                                              
+                                                                                                                                              
+    \subsection{Vincoli del Problema}                                                                                                         
+                                                                                                                                              
+    Una selezione di giocatori è considerata ammissibile se e solo se soddisfa simultaneamente i seguenti due vincoli operativi:              
+                                                                                                                                              
+    \begin{itemize}                                                                                                                           
+        \item \textbf{Vincolo di Rosa (Esclusività di Ruolo):} per ogni singolo ruolo $i \in \{1, \dots, N\}$, è ammesso l'ingaggio di al     
+  massimo un giocatore. È consentito non ingaggiare alcun candidato in un determinato ruolo (mantenendo la riserva d'ufficio presente in rosa 
+  a costo $0$ e apporto incrementale nullo).                                                                                                  
+                                                                                                                                              
+        Formalmente, introducendo le variabili binarie di decisione:                                                                          
+        \[                                                                                                                                    
+        x_{i,k} \in \{0, 1\} \quad \forall i \in \{1, \dots, N\}, \quad \forall k \in \{1, \dots, P_i\}                                       
+        \]                                                                                                                                    
+        il vincolo si esprime come:                                                                                                           
+        \[                                                                                                                                    
+        \sum_{k=1}^{P_i} x_{i,k} \le 1 \quad \forall i \in \{1, \dots, N\}                                                                    
+        \]                                                                                                                                    
+                                                                                                                                              
+        \item \textbf{Vincolo di Bilancio (Budget Globale):} la somma cumulativa dei costi associati a tutti i giocatori ingaggiati non deve  
+  eccedere la soglia di budget $B$ fissata a monte:                                                                                           
+        \[                                                                                                                                    
+        \sum_{i=1}^N \sum_{k=1}^{P_i} c_{i,k} \cdot x_{i,k} \le B                                                                             
+        \]                                                                                                                                    
+    \end{itemize}                                                                                                                             
+                                                                                                                                              
+                                                                                                                                              
+    \subsection{Funzione Obiettivo e Output Richiesto}                                                                                        
+                                                                                                                                              
+    Il problema si qualifica come un problema di massimizzazione vincolata.                                                                   
+                                                                                                                                              
+    \begin{itemize}                                                                                                                           
+        \item \textbf{Funzione Obiettivo:} determinare l'assegnamento ottimale delle variabili decisionali $x_{i,k}$ tale da massimizzare il  
+  valore cumulativo (competitività totale della rosa) apportato alla squadra:                                                                 
+        \[                                                                                                                                    
+        \max \sum_{i=1}^N \sum_{k=1}^{P_i} v_{i,k} \cdot x_{i,k}                                                                              
+        \]                                                                                                                                    
+        sotto il rispetto dei vincoli definiti alla sottosezione 1.3.                                                                         
+                                                                                                                                              
+        \item \textbf{Output Richiesto:} conformemente alle specifiche di progetto, la risoluzione deve produrre:                             
+        \begin{enumerate}                                                                                                                     
+            \item \textbf{Il valore scalare ottimo}, ovvero il massimo VORP complessivo conseguibile senza violare il vincolo finanziario.    
+            \item \textbf{La configurazione ottima} (la rosa definitiva), descritta mediante l'elenco esatto dei giocatori scelti ruolo per   
+  ruolo che realizzano tale rendimento.                                                                                                       
+        \end{enumerate}                                                                                                                       
+    \end{itemize}
+
+
+
+\HWproblem
+This is the first problem.
+This is the first problem.
+This is the first problem.
+This is the first problem.
+This is the first problem.
+This is the first problem.
+
+This is the second paragraph of the first problem. This equation $c^2 = a^2 + b^2 - 2ab \cos(\theta_C)$ is an example of in-line math.
+
+And this is an example of display mode math:
+$$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
+This is an example of the align* environment, which can be helpful for mathematical expressions with multiple steps:
+\begin{align*}
+r &= 1/2 + 1/3 + 1/4 + 1/5 + 1/6 + 1/7 + 1/8 + \ldots + 1/n\\
+&> 1/2 + 1/4 + 1/4 + 1/8 + 1/8 + 1/8 + 1/8 + \ldots + 1/n\\
+&= \sum_{i = 1}^{\log_2 n} \frac{2^{i - 1}}{2^i}\\
+&= \frac{1}{2} \log_2 (n)\\ 
+&= \Omega(\log n)
+\end{align*}
+This is an example of matrices in \LaTeX:
+\begin{align*}
+	\sigma_x &=
+		\begin{pmatrix}
+		0 & 1 \\
+		1 & 0
+		\end{pmatrix} \\
+	\sigma_y &=
+		\begin{pmatrix}
+		0 & -i \\
+		i & 0
+		\end{pmatrix} \\
+	\sigma_z &=
+		\begin{pmatrix}
+		1 & 0 \\
+		0 & -1
+		\end{pmatrix} \\
+\end{align*}
+This concludes the first problem and the mathematical examples. The following questions demonstrate how to use the template for multipart problems.
+
+\HWproblem
+\HWsubproblem
+This is the second problem, first question.
+This is the second problem, first question.
+This is the second problem, first question.
+This is the second problem, first question.
+This is the second problem, first question.
+This is the second problem, first question.
+\HWsubproblem
+This is the second problem, second question.
+This is the second problem, second question.
+This is the second problem, second question.
+This is the second problem, second question.
+This is the second problem, second question.
+This is the second problem, second question.
+\HWsubproblem
+This is the second problem, third question.
+This is the second problem, third question.
+This is the second problem, third question.
+This is the second problem, third question.
+This is the second problem, third question.
+This is the second problem, third question.
+
+
+\HWproblem
+This is an introduction to the the third problem.
+\HWsubproblem
+This is the third problem, first question.
+This is the third problem, first question.
+This is the third problem, first question.
+This is the third problem, first question.
+This is the third problem, first question.
+This is the third problem, first question.
+\HWsubproblem
+This is the third problem, second question.
+This is the third problem, second question.
+This is the third problem, second question.
+This is the third problem, second question.
+This is the third problem, second question.
+This is the third problem, second question.
+\HWsubproblem
+This is the third problem, third question.
+This is the third problem, third question.
+This is the third problem, third question.
+This is the third problem, third question.
+This is the third problem, third question.
+This is the third problem, third question.
+\HWsubproblem
+This is the third problem, fourth question.
+This is the third problem, fourth question.
+This is the third problem, fourth question.
+This is the third problem, fourth question.
+This is the third problem, fourth question.
+This is the third problem, fourth question.
+
+\HWproblem
+And this is the final one.
+And this is the final one.
+And this is the final one.
+And this is the final one.
+And this is the final one.
+And this is the final one.
+
+And this is the final one.
+And this is the final one.
+And this is the final one.
+And this is the final one.
+And this is the final one.
+And this is the final one.
+
+And this is the final one.
+And this is the final one.
+And this is the final one.
+And this is the final one.
+And this is the final one.
+And this is the final one.
+\end{document}
