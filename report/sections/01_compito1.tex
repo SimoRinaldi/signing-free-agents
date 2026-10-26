@@ -1,0 +1,133 @@
+\section{Compito 1}
+
+\subsection{Descrizione del problema}
+Il problema affrontato in questo elaborato consiste nell'ottimizzazione dell'ingaggio di giocatori per una squadra sportiva a budget limitato. Tale formulazione modella il tipico scenario decisionale affrontato dalla dirigenza di un club durante una sessione di calciomercato: la necessità di comporre la rosa più competitiva possibile rispettando vincoli di bilancio e di copertura dei ruoli.
+
+In letteratura accademica, il problema è tratto dal testo di riferimento \textit{Introduction to Algorithms} (T.~H.~Cormen, C.~E.~Leiserson, R.~L.~Rivest, C.~Stein), in particolare dal Problema 15-12 (``Signing free-agent baseball players'') presente nel capitolo dedicato alla programmazione dinamica. Nella teoria dell'ottimizzazione combinatoria e della ricerca operativa, tale problema costituisce un'istanza canonica del Multiple-Choice Knapsack Problem (MCKP), variante specializzata del classico problema dello zaino (0/1 Knapsack) in cui gli oggetti sono partizionati in classi disgiunte e mutualmente esclusive.
+
+\subsection{Formulazione Matematica dell'Input}
+L'istanza del problema riceve in ingresso un insieme strutturato di dati discreti e deterministici:
+
+\begin{itemize}
+    \item \textbf{Budget Totale ($B$):} un intero non negativo $B \in \mathbb{N}$ che rappresenta la disponibilità finanziaria massima spendibile per l'ingaggio complessivo dei componenti della squadra.
+    \item \textbf{Numero di Ruoli ($N$):} un intero positivo $N \in \mathbb{N}$ che definisce il numero complessivo di ruoli/reparti tecnici necessari alla formazione della squadra (es. portiere, difensore, centrocampista, attaccante). I ruoli sono indicizzati da $i = 1, 2, \dots, N$.
+    \item \textbf{Candidati per Ruolo ($P_i$):} per ciascun ruolo $i \in \{1, \dots, N\}$, è disponibile sul mercato un insieme finito di $P_i$ candidati svincolati, indicizzati con $k \in \{1, 2, \dots, P_i\}$.
+    \item \textbf{Parametri dei Giocatori:} ogni candidato $k$ appartenente al ruolo $i$ è univocamente caratterizzato da una coppia di parametri non negativi:
+    \begin{itemize}
+        \item $c_{i,k} \in \mathbb{N}$: costo d'acquisto/ingaggio del giocatore.
+        \item $v_{i,k} \in \mathbb{R}^+$ (o $\mathbb{N}$): valore tecnico atteso o metrica di rendimento del giocatore (corrispondente al parametro VORP -- \textit{Value Over Replacement Player} del testo di Cormen).
+    \end{itemize}
+\end{itemize}
+
+\subsection{Vincoli del Problema}
+Una selezione di giocatori è considerata ammissibile se e solo se soddisfa simultaneamente i seguenti due vincoli operativi:
+
+\begin{itemize}
+    \item \textbf{Vincolo di Rosa (Esclusività di Ruolo):} per ogni singolo ruolo $i \in \{1, \dots, N\}$, è ammesso l'ingaggio di al massimo un giocatore. È consentito non ingaggiare alcun candidato in un determinato ruolo (mantenendo la riserva d'ufficio presente in rosa a costo $0$ e apporto incrementale nullo).
+
+    Formalmente, introducendo le variabili binarie di decisione:
+    \[
+    x_{i,k} \in \{0, 1\} \quad \forall i \in \{1, \dots, N\}, \quad \forall k \in \{1, \dots, P_i\}
+    \]
+    il vincolo si esprime come:
+    \[
+    \sum_{k=1}^{P_i} x_{i,k} \le 1 \quad \forall i \in \{1, \dots, N\}
+    \]
+
+    \item \textbf{Vincolo di Bilancio (Budget Globale):} la somma cumulativa dei costi associati a tutti i giocatori ingaggiati non deve eccedere la soglia di budget $B$ fissata a monte:
+    \[
+    \sum_{i=1}^N \sum_{k=1}^{P_i} c_{i,k} \cdot x_{i,k} \le B
+    \]
+\end{itemize}
+
+\subsection{Funzione Obiettivo e Output Richiesto}
+Il problema si qualifica come un problema di massimizzazione vincolata.
+
+\begin{itemize}
+    \item \textbf{Funzione Obiettivo:} determinare l'assegnamento ottimale delle variabili decisionali $x_{i,k}$ tale da massimizzare il valore cumulativo (competitività totale della rosa) apportato alla squadra:
+    \[
+    \max \sum_{i=1}^N \sum_{k=1}^{P_i} v_{i,k} \cdot x_{i,k}
+    \]
+    sotto il rispetto dei vincoli definiti precedentemente.
+
+    \item \textbf{Output Richiesto:} conformemente alle specifiche di progetto, la risoluzione deve produrre:
+    \begin{enumerate}
+        \item \textbf{Il valore scalare ottimo}, ovvero il massimo VORP complessivo conseguibile senza violare il vincolo finanziario.
+        \item \textbf{La configurazione ottima} (la rosa definitiva), descritta mediante l'elenco esatto dei giocatori scelti ruolo per ruolo che realizzano tale rendimento.
+    \end{enumerate}
+\end{itemize}
+
+\subsection{Dimostrazione dell'Applicabilità della Programmazione Dinamica}
+L'applicabilità del paradigma della programmazione dinamica a un problema di ottimizzazione poggia su due presupposti teorici fondamentali:
+\begin{enumerate}
+    \item la presenza di una \textbf{sottostruttura ottima} all'interno di una soluzione ottima;
+    \item l'esistenza di una \textbf{sovrapposizione dei sottoproblemi} (\textit{overlapping subproblems}).
+\end{enumerate}
+
+\subsubsection{Definizione dei Sottoproblemi}
+Siano $N$ le posizioni da ricoprire (numerate da $1$ a $N$), $P$ il numero di giocatori per ruolo e $X$ il budget nominale disponibile. Per specifica, i costi di ciascun giocatore sono multipli di $100\,000$: introducendo la costante di scala $\text{COST\_UNIT} = 100\,000$, definiamo il budget discreto:
+\[
+B = \left\lfloor \frac{X}{\text{COST\_UNIT}} \right\rfloor
+\]
+Analogamente, il costo intero scalato del $j$-esimo giocatore per il ruolo $i$ ($0 \le j < P$) è dato da $c_{i, j} = \left\lfloor \text{players}[i-1, j].cost / \text{COST\_UNIT} \right\rfloor$.
+
+Definiamo formalmente il generico \textbf{sottoproblema} associato alla coppia di parametri $(i, b)$ come:
+\begin{quote}
+\textit{«Massimizzare il WAR complessivo considerando esclusivamente un sottoinsieme di ruoli tra i primi $i$ (con $0 \le i \le N$), disponendo di una quantità di budget residuo pari al più a $b$ (con $0 \le b \le B$).»}
+\end{quote}
+Indichiamo con $m[i, b]$ il valore della soluzione ottima di tale sottoproblema.
+
+\subsubsection{Dimostrazione della Sottostruttura Ottima}
+Un problema esibisce una sottostruttura ottima se una soluzione ottima al problema contiene al suo interno soluzioni ottime per i relativi sottoproblemi. Dimostriamo tale proprietà per assurdo, facendo ricorso alla classica tecnica del \textit{cut-and-paste}.
+
+Sia $R^*$ una soluzione ottima per il sottoproblema generico $(i, b)$, ovvero una selezione ammissibile di giocatori scelti tra i primi $i$ ruoli che rispetta il vincolo di bilancio residuo $\le b$ e consegue il massimo valore cumulativo $m[i, b]$. Rispetto alla decisione assunta per l'$i$-esimo ruolo, si presentano due casi mutualmente esclusivi ed esaustivi:
+
+\begin{enumerate}
+    \item \textbf{Caso 1: Nessun giocatore svincolato viene ingaggiato per il ruolo $i$.} \\
+    In questo caso la rosa $R^*$ è interamente composta da giocatori appartenenti ai primi $i-1$ ruoli con spesa cumulativa non superiore a $b$. Di conseguenza, $R^*$ costituisce una soluzione ammissibile per il sottoproblema $(i-1, b)$. \\
+    \textit{Dimostrazione}: se per assurdo $R^*$ non fosse ottima per $(i-1, b)$, allora esisterebbe una diversa configurazione ammissibile $R'$ per i primi $i-1$ ruoli, con costo $\le b$, tale che $\text{WAR}(R') > \text{WAR}(R^*)$. Poiché $R'$ non alloca alcun giocatore al ruolo $i$, essa rappresenterebbe anche una soluzione ammissibile per $(i, b)$ con rendimento $\text{WAR}(R') > \text{WAR}(R^*)$, contraddicendo l'ipotesi di ottimalità globale di $R^*$ su $(i, b)$.
+
+    \item \textbf{Caso 2: Viene ingaggiato il candidato $p = \text{players}[i-1, j^*]$ per il ruolo $i$, avente costo scalato $c_{i, j^*} \le b$ e valore $p.war$.} \\
+    Rimuovendo $p$ dalla soluzione ottima, consideriamo la sottorosa $R' = R^* \setminus \{p\}$. Poiché $R^*$ rispetta il vincolo di bilancio complessivo $\le b$, la sottorosa $R'$ impegna una quota di spesa non superiore a $b - c_{i, j^*}$ sui primi $i-1$ ruoli, qualificandosi come soluzione ammissibile per il sottoproblema $(i-1, b - c_{i, j^*})$, con rendimento pari a $\text{WAR}(R') = \text{WAR}(R^*) - p.war$. \\
+    \textit{Dimostrazione}: supponiamo per assurdo che $R'$ non sia una soluzione ottima per il sottoproblema $(i-1, b - c_{i, j^*})$. Allora deve esistere una rosa ammissibile alternativa $R''$ per i primi $i-1$ ruoli, con spesa $\le b - c_{i, j^*}$, tale che:
+    \[
+    \text{WAR}(R'') > \text{WAR}(R')
+    \]
+    Possiamo quindi costruire una nuova rosa $R_{\text{new}} = R'' \cup \{p\}$ per i primi $i$ ruoli. Verifichiamo che $R_{\text{new}}$ sia ammissibile per il sottoproblema $(i, b)$:
+    \begin{itemize}
+        \item \textit{Vincolo di rosa}: $R''$ include al più un giocatore per ciascuno dei primi $i-1$ ruoli; aggiungendo $p$ (che ricopre il ruolo $i$), ogni posizione tra $1$ e $i$ ospita al massimo un elemento.
+        \item \textit{Vincolo di bilancio}: il costo complessivo di $R''$ è $\le b - c_{i, j^*}$. Aggiungendo il costo del giocatore $p$, la spesa totale diventa $\le (b - c_{i, j^*}) + c_{i, j^*} = b \le B$.
+    \end{itemize}
+    Calcolando il rendimento complessivo della nuova configurazione:
+    \[
+    \text{WAR}(R_{\text{new}}) = \text{WAR}(R'') + p.war > \text{WAR}(R') + p.war = \text{WAR}(R^*)
+    \]
+    Abbiamo così ottenuto una rosa ammissibile per $(i, b)$ avente un rendimento strettamente superiore a quello di $R^*$, il che contraddice l'assunto di ottimalità di $R^*$. Ne consegue che la sottorosa $R'$ deve necessariamente essere una soluzione ottima per il sottoproblema $(i-1, b - c_{i, j^*})$.
+\end{enumerate}
+In entrambi i casi, la soluzione ottima globale incorpora soluzioni ottime per i sottoproblemi correlati. La proprietà di sottostruttura ottima è pertanto verificata.
+
+\subsubsection{Sovrapposizione dei Sottoproblemi}
+La seconda proprietà richiesta per l'efficacia del paradigma dinamico riguarda la presenza di sottoproblemi comuni ricorsivamente condivisi:
+\begin{itemize}
+    \item \textbf{Spazio totale dei sottoproblemi distinti:} ogni sottoproblema è univocamente individuato dalla coppia di indici $(i, b)$, con $0 \le i \le N$ e $0 \le b \le B$. Il numero totale di sottoproblemi distinti è strettamente limitato e pari a:
+    \[
+    (N + 1) \times (B + 1)
+    \]
+    \item \textbf{Inefficienza di un approccio ricorsivo ingenuo:} se si tentasse di risolvere il problema mediante un algoritmo puramente ricorsivo (o basato su divide-et-impera standard senza memorizzazione), l'algoritmo tenterebbe di calcolare tutte le combinazioni possibili a ogni invocazione. Di conseguenza, a ogni livello $i$ si aprirebbero fino a $P + 1$ rami di scelta (non ingaggiare nessuno o selezionare uno tra i $P$ candidati). L'albero di ricorsione genererebbe complessivamente $\Omega((P + 1)^N)$ chiamate, crescendo in modo esponenziale rispetto al numero di ruoli da coprire.
+    \item \textbf{Sottoproblemi comuni calcolati ripetutamente:} in questo problema scelte di ingaggio diverse in ruoli differenti possono portare al medesimo ruolo $i$ con lo stesso budget residuo $b$. Ad esempio, ingaggiare un giocatore da 2 milioni al ruolo 1 e nessuno al ruolo 2 produce esattamente lo stesso budget residuo che ingaggiare due giocatori da 1 milione ai ruoli 1 e 2. Un algoritmo privo di memoria risolverebbe ciascuno stato comune $(i, b)$ un numero esponenziale di volte.
+\end{itemize}
+La programmazione dinamica risolve ciascuno dei sottoproblemi una sola volta, memorizzandone l'esito nella tabella $m[i, b]$ e garantendo che la consultazione avvenga in tempo costante $\Theta(1)$ nei passi successivi.
+
+\subsection{Equazione di Ricorrenza}
+In virtù delle proprietà dimostrate, il valore della soluzione ottima $m[i, b]$ è calcolabile mediante la seguente equazione di ricorrenza:
+\[
+\begin{cases} 
+0 & \text{se } i = 0 \text{ oppure } b = 0 \\
+\max \left( m[i - 1, b], \; \max\limits_{\substack{0 \le j < P \\ c_{i, j} \le b}} \{ m[i - 1, b - c_{i, j}] + \text{players}[i-1, j].war \} \right) & \text{se } i > 0 \text{ e } b > 0
+\end{cases}
+\]
+Nel passo ricorsivo:
+\begin{itemize}
+    \item il primo termine $m[i - 1, b]$ rappresenta la scelta di non ingaggiare alcun giocatore per il ruolo $i$ (mantenendo inalterato il WAR conseguito sui primi $i-1$ ruoli senza consumare budget aggiuntivo);
+    \item il secondo termine valuta l'opzione di ingaggiare il miglior candidato $j$ tra i $P$ disponibili per il ruolo $i$, a patto che il suo costo scalato $c_{i, j}$ non ecceda il budget residuo $b$.
+\end{itemize}

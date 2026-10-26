@@ -42,38 +42,43 @@
 % \HWcourse:               the course you are submitting to (cis-XXX).
 \RequirePackage{ifthen}
 \makeatletter
-\newcommand{\HWauthor}[2]{%
+\newcommand{\HWauthor}[3][]{%
   \ifthenelse{\isundefined{\theHWauthors}}{%
-    \def\theHWauthors{#1\\#2}
+    \def\theHWauthors{#2\\#3}%
   }%
   {%
-    \g@addto@macro\theHWauthors{\and #1\\#2}
-  }
+    \g@addto@macro\theHWauthors{\and #2\\#3}%
+  }%
+  \ifthenelse{\equal{#1}{}}{%
+    \def\@currauthorhead{#2}%
+  }{%
+    \def\@currauthorhead{#1}%
+  }%
   \ifthenelse{\isundefined{\theHWauthorsatheader}}{%
-    \def\theHWauthorsatheader{#1}
+    \let\theHWauthorsatheader\@currauthorhead
   }%
   {%
-    \g@addto@macro\theHWauthorsatheader{, #1}
-  }
+    \g@addto@macro\theHWauthorsatheader{, \@currauthorhead}%
+  }%
 }
 \newcommand{\HWno}[1]{%
   \ifthenelse{\isundefined{\theHWno}}{%
-    \def\theHWno{#1}
+    \def\theHWno{#1}%
   }%
   {%
-    \let\theHWno{#1}
-  }
+    \let\theHWno{#1}%
+  }%
 }
 \newcommand{\HWcourse}[1]{%
   \ifthenelse{\isundefined{\theHWcourse}}{%
-    \def\theHWcourse{#1}
+    \def\theHWcourse{#1}%
   }%
   {%
-    \let\theHWcourse{#1}
-  }
+    \let\theHWcourse{#1}%
+  }%
 }
 \newcommand{\HWextension}{%
-  \def\theHWextension{Yes}
+  \def\theHWextension{Yes}%
 }
 \makeatother
 % \HWpartner{Name}: Declare somebody you worked with on the homework.
@@ -108,7 +113,7 @@
   \setcounter{theHWsubproblem}{1}
 }
 
-\titleformat{\subsubsection}[runin]{\bfseries}{}{}{}[)]
+\titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}
 
 \newcommand{\HWsubproblem}{%
   \subsubsection*{\alph{theHWsubproblem}}
@@ -123,11 +128,11 @@
 \RequirePackage{fancyhdr}
 
 \pagestyle{fancy}
-\fancyhead[R]{\theHWauthorsatheader}
-\fancyhead[C]{\theHWcourse}
-\fancyhead[L]{\ifthenelse{\isundefined{\theHWno}}{}{Homework \theHWno}}                                                                   \fancyfoot[R]{}
+\fancyhf{}
+\fancyhead[L]{\small\theHWcourse}
+\fancyhead[R]{\small\theHWauthorsatheader}
 \fancyfoot[C]{\thepage}
-\fancyfoot[L]{}
+\renewcommand{\headrulewidth}{0.4pt}
 %%
 %% ============================================================
 
