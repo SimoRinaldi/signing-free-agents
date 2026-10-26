@@ -1,5 +1,5 @@
-from dataclasses import dataclass
-from typing import List
+from dataclasses import dataclass, asdict
+from typing import Any, Dict, List
 
 
 @dataclass(frozen=True)
@@ -51,3 +51,26 @@ class RosterSolution:
     optimal_war: float
     players: List[Player]
     total_cost: int
+
+    @classmethod
+    def create(cls, players: List[Player]) -> "RosterSolution":
+        total_cost = sum(p.cost for p in players)
+        optimal_war = round(sum(p.war for p in players), 4)
+        return cls(optimal_war=optimal_war, players=players, total_cost=total_cost)
+
+
+@dataclass(frozen=True)
+class BenchmarkMetric:
+    scenario: str
+    N: int
+    budget: int
+    B: int
+    P: int
+    instance_size: int
+    algorithm: str
+    optimal_war: float
+    time_ms: float
+    memory_kib: float
+
+    def to_dict(self) -> Dict[str, Any]:
+        return asdict(self)

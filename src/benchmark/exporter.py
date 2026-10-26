@@ -1,20 +1,21 @@
 import csv
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
+from src.core.models import BenchmarkMetric
 
 
-# Classe responsabile dell'esportazione delle metriche e delle matrici di ispezione
 class DataExporter:
-    def __init__(self, output_dir: str = "results"):
+    def __init__(self, output_dir: Union[str, Path] = "results"):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.metrics_records: List[Dict[str, Any]] = []
 
-    # Registra una riga di metriche prestazionali
-    def add_metric(self, record: Dict[str, Any]):
-        self.metrics_records.append(record)
+    def add_metric(self, record: Union[Dict[str, Any], BenchmarkMetric]) -> None:
+        if isinstance(record, BenchmarkMetric):
+            self.metrics_records.append(record.to_dict())
+        else:
+            self.metrics_records.append(record)
 
-    # Esporta l'elenco delle metriche registrate su file CSV
     def export_metrics_to_csv(
         self, filename: str = "benchmark_metrics.csv"
     ) -> Optional[Path]:
@@ -31,7 +32,6 @@ class DataExporter:
 
         return file_path
 
-    # Esporta una matrice (m o s) su file CSV con etichette di riga e colonna
     def export_matrix_to_csv(
         self,
         matrix: List[List[Any]],
@@ -40,8 +40,7 @@ class DataExporter:
         col_labels: Optional[List[str]] = None,
     ) -> Path:
         file_path = self.output_dir / filename
-        num_rows = len(matrix)
-        num_cols = len(matrix[0])
+        num_cols = len(matrix[0]) if matrix else 0
 
         if col_labels is None:
             col_labels = [f"b={b}" for b in range(num_cols)]
@@ -63,8 +62,12 @@ class DataExporter:
 
         return file_path
 
-    # Formattazione della matrice per ispezione con header, indentazione e 1 decimale
-    def format_matrix(self, matrix, row_labels=None, col_labels=None):
+    def format_matrix(
+        self,
+        matrix: List[List[Any]],
+        row_labels: Optional[List[str]] = None,
+        col_labels: Optional[List[str]] = None,
+    ) -> str:
         if not matrix:
             return ""
 

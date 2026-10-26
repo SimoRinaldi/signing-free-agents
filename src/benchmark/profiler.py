@@ -1,7 +1,7 @@
 import time
 import tracemalloc
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Callable, Tuple
 
 
 @dataclass
@@ -11,20 +11,20 @@ class BenchmarkResult:
     peak_memory_kib: float
 
     @property
-    def value(self):
+    def value(self) -> Any:
         return self.result[0] if isinstance(self.result, tuple) else self.result
 
     def __iter__(self):
         return iter((self.value, self.time_ms, self.peak_memory_kib))
 
 
-# Classe per la profilazione delle prestazioni di tempo e memoria RAM
 class PerformanceProfiler:
     def __init__(self, repetitions: int = 10):
-        self.repetitions = repetitions
+        self.repetitions = max(1, repetitions)
 
-    # Misura il tempo minimo di esecuzione su n ripetizioni
-    def measure_time(self, func, *args, **kwargs):
+    def measure_time(
+        self, func: Callable[..., Any], *args: Any, **kwargs: Any
+    ) -> Tuple[Any, float]:
         times = []
         result = None
 
@@ -33,15 +33,16 @@ class PerformanceProfiler:
             current_result = func(*args, **kwargs)
             end = time.perf_counter()
 
-            times.append((end - start) * 1000)
+            times.append((end - start) * 1000.0)
             if i == 0:
                 result = current_result
 
         min_time_ms = min(times)
         return result, min_time_ms
 
-    # Misura il picco di memoria RAM allocata con tracemalloc
-    def measure_peak_memory(self, func, *args, **kwargs):
+    def measure_peak_memory(
+        self, func: Callable[..., Any], *args: Any, **kwargs: Any
+    ) -> Tuple[Any, float]:
         tracemalloc.start()
         tracemalloc.reset_peak()
 
@@ -50,11 +51,12 @@ class PerformanceProfiler:
         _, peak_bytes = tracemalloc.get_traced_memory()
         tracemalloc.stop()
 
-        peak_kib = peak_bytes / 1024
+        peak_kib = peak_bytes / 1024.0
         return result, peak_kib
 
-    # Esegue entrambe le misurazioni e restituisce un BenchmarkResult
-    def profile(self, func, *args, **kwargs) -> BenchmarkResult:
+    def profile(
+        self, func: Callable[..., Any], *args: Any, **kwargs: Any
+    ) -> BenchmarkResult:
         result, time_ms = self.measure_time(func, *args, **kwargs)
         _, peak_kib = self.measure_peak_memory(func, *args, **kwargs)
         return BenchmarkResult(result=result, time_ms=time_ms, peak_memory_kib=peak_kib)

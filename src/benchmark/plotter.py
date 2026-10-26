@@ -1,17 +1,17 @@
 from pathlib import Path
+from typing import List, Union
 import matplotlib.pyplot as plt
 import pandas as pd
+from src.benchmark.strategy import AlgorithmName
 
 
-# Classe per la generazione dei grafici prestazionali
 class PerformancePlotter:
     def __init__(
         self,
-        metrics_csv: str = "results/benchmark_metrics.csv",
-        output_dir: str = "results",
+        metrics_csv: Union[str, Path] = "results/benchmark_metrics.csv",
+        output_dir: Union[str, Path] = "results",
         log_optimal_val: bool = False,
         log_reconstruction: bool = False,
-        log_pareto: bool = False,
         show_plots: bool = False,
     ):
         self.metrics_csv = Path(metrics_csv)
@@ -19,7 +19,6 @@ class PerformancePlotter:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.log_optimal_val = log_optimal_val
         self.log_reconstruction = log_reconstruction
-        self.log_pareto = log_pareto
         self.show_plots = show_plots
 
     def load_data(self) -> pd.DataFrame:
@@ -27,20 +26,23 @@ class PerformancePlotter:
         df["NB"] = df["N"] * df["B"]
         return df
 
-    # Grafico 1: Confronto tra algoritmi per il calcolo del solo valore ottimo
-    def plot_optimal_value_comparison(self):
+    def plot_optimal_value_comparison(self) -> Path:
+        """Confronta tempo ed occupazione di memoria tra gli algoritmi per il valore ottimo."""
         df = self.load_data()
         target_algos = [
-            ("Bottom Up (matrice m)", "royalblue", "o"),
-            ("Bottom Up (matrice m, filtro)", "firebrick", "*"),
-            ("Bottom Up (vettore)", "forestgreen", "s"),
-            ("Top Down", "darkorange", "^"),
+            (AlgorithmName.BOTTOM_UP_WITHOUT_S, "royalblue", "o"),
+            (AlgorithmName.BOTTOM_UP_FILTER, "firebrick", "*"),
+            (AlgorithmName.BOTTOM_UP_VECTOR, "forestgreen", "s"),
+            (AlgorithmName.TOP_DOWN, "darkorange", "^"),
         ]
 
         fig, (ax_time, ax_mem) = plt.subplots(1, 2, figsize=(14, 5))
 
         for algo_name, color, marker in target_algos:
             subset = df[df["algorithm"] == algo_name].sort_values("instance_size")
+            if subset.empty:
+                continue
+
             ax_time.plot(
                 subset["instance_size"],
                 subset["time_ms"],
@@ -95,34 +97,36 @@ class PerformancePlotter:
         plt.close(fig)
         return save_path
 
-    # Grafico 2: Confronto memoria per la ricostruzione (con s vs senza s)
-    def plot_reconstruction_comparison(self):
+    def plot_reconstruction_comparison(self) -> Path:
+        """Confronta l'impatto sulla memoria tra il calcolo con tabella s e quello con sola matrice m."""
         df = self.load_data()
         fig, ax = plt.subplots(figsize=(8, 5))
 
         subset_s = df[
-            df["algorithm"] == "Bottom Up Solver (con tabella s)"
+            df["algorithm"] == AlgorithmName.BOTTOM_UP_WITH_S
         ].sort_values("NB")
         subset_no_s = df[
-            df["algorithm"] == "Bottom Up Solver (solo matrice m)"
+            df["algorithm"] == AlgorithmName.BOTTOM_UP_WITHOUT_S
         ].sort_values("NB")
 
-        ax.plot(
-            subset_s["NB"],
-            subset_s["memory_kib"],
-            label="Con matrice s (m + s, ricostruzione O(N))",
-            color="firebrick",
-            marker="o",
-            linewidth=2,
-        )
-        ax.plot(
-            subset_no_s["NB"],
-            subset_no_s["memory_kib"],
-            label="Senza matrice s (solo m, ricostruzione O(N*P))",
-            color="royalblue",
-            marker="s",
-            linewidth=2,
-        )
+        if not subset_s.empty:
+            ax.plot(
+                subset_s["NB"],
+                subset_s["memory_kib"],
+                label="Con matrice s (m + s, ricostruzione O(N))",
+                color="firebrick",
+                marker="o",
+                linewidth=2,
+            )
+        if not subset_no_s.empty:
+            ax.plot(
+                subset_no_s["NB"],
+                subset_no_s["memory_kib"],
+                label="Senza matrice s (solo m, ricostruzione O(N*P))",
+                color="royalblue",
+                marker="s",
+                linewidth=2,
+            )
 
         if self.log_reconstruction:
             ax.set_xscale("log")
@@ -148,18 +152,18 @@ class PerformancePlotter:
         plt.close(fig)
         return save_path
 
-    # Genera una tabella grafica di riepilogo comparativo tra gli algoritmi
-    def plot_comparison_table(self):
+    def plot_comparison_table(self) -> Path:
+        """Genera una tabella di riepilogo comparativo tra gli algoritmi in formato PNG."""
         df = self.load_data()
         scenarios = df["scenario"].unique()
 
         algo_abbr = {
-            "Bottom Up (matrice s)": "BU (con s)",
-            "Bottom Up (matrice m)": "BU (senza s)",
-            "Bottom Up (vettore)": "BU (vettore)",
-            "Top Down": "Top Down",
-            "Bottom Up (matrice m, filtro)": "BU (filtro)",
-            "Bottom Up (vettore, filtro)": "BU (vettore, filtro)",
+            AlgorithmName.BOTTOM_UP_WITH_S: "BU (con s)",
+            AlgorithmName.BOTTOM_UP_WITHOUT_S: "BU (senza s)",
+            AlgorithmName.BOTTOM_UP_VECTOR: "BU (vettore)",
+            AlgorithmName.TOP_DOWN: "Top Down",
+            AlgorithmName.BOTTOM_UP_FILTER: "BU (filtro)",
+            AlgorithmName.BOTTOM_UP_VECTOR_FILTER: "BU (vettore, filtro)",
         }
 
         col_labels = [
@@ -216,7 +220,6 @@ class PerformancePlotter:
         table.set_fontsize(9)
         table.scale(1.0, 2.0)
 
-        # Stile testata e celle
         for (r, c), cell in table.get_celld().items():
             if r == 0:
                 cell.set_facecolor("#2c3e50")
@@ -232,8 +235,7 @@ class PerformancePlotter:
         plt.close(fig)
         return save_path
 
-    # Genera tutti i grafici e la tabella
-    def plot_all(self):
+    def plot_all(self) -> List[Path]:
         p1 = self.plot_optimal_value_comparison()
         p2 = self.plot_reconstruction_comparison()
         p3 = self.plot_comparison_table()

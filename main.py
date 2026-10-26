@@ -1,20 +1,39 @@
 from pathlib import Path
+from typing import List
 
 from src.core.loader import load_scenario
+from src.core.models import BenchmarkMetric
 from src.benchmark.profiler import PerformanceProfiler
 from src.benchmark.exporter import DataExporter
 from src.benchmark.plotter import PerformancePlotter
+from src.benchmark.strategy import AlgorithmName, SolverStrategy
+
 from src.algorithms.optimal_value import (
     compute_optimal_war,
     compute_optimal_war_without_s,
 )
-from src.algorithms.optimal_solution import (
-    reconstruct_optimal_roster,
-    reconstruct_optimal_roster_without_s,
-)
 from src.algorithms.space_optimized import compute_optimal_war_with_one_vector
 from src.algorithms.time_optimized import compute_optimal_war_with_recursion
 from src.algorithms.filter import filter_players
+
+
+def get_benchmark_strategies() -> List[SolverStrategy]:
+    return [
+        SolverStrategy(AlgorithmName.BOTTOM_UP_WITH_S, compute_optimal_war),
+        SolverStrategy(AlgorithmName.BOTTOM_UP_WITHOUT_S, compute_optimal_war_without_s),
+        SolverStrategy(AlgorithmName.BOTTOM_UP_VECTOR, compute_optimal_war_with_one_vector),
+        SolverStrategy(AlgorithmName.TOP_DOWN, compute_optimal_war_with_recursion),
+        SolverStrategy(
+            AlgorithmName.BOTTOM_UP_FILTER,
+            compute_optimal_war_without_s,
+            use_filter=True,
+        ),
+        SolverStrategy(
+            AlgorithmName.BOTTOM_UP_VECTOR_FILTER,
+            compute_optimal_war_with_one_vector,
+            use_filter=True,
+        ),
+    ]
 
 
 def main():
@@ -26,6 +45,7 @@ def main():
         scenarios_dir.glob("*.json"), key=lambda p: load_scenario(p).instance_size
     )
 
+    strategies = get_benchmark_strategies()
     total_scenarios = len(scenario_files)
     print(f"\nAvvio benchmark su {total_scenarios} scenari in '{scenarios_dir}/'...\n")
 
@@ -44,44 +64,25 @@ def main():
 
         filtered_players = filter_players(players, cost_unit, scenario.B)
 
-        solvers = [
-            ("Bottom Up (matrice s)", compute_optimal_war, players),
-            (
-                "Bottom Up (matrice m)",
-                compute_optimal_war_without_s,
-                players,
-            ),
-            ("Bottom Up (vettore)", compute_optimal_war_with_one_vector, players),
-            ("Top Down", compute_optimal_war_with_recursion, players),
-            (
-                "Bottom Up (matrice m, filtro)",
-                compute_optimal_war_without_s,
-                filtered_players,
-            ),
-            (
-                "Bottom Up (vettore, filtro)",
-                compute_optimal_war_with_one_vector,
-                filtered_players,
-            ),
-        ]
-
-        for name, solver_func, input_players in solvers:
+        for strategy in strategies:
+            input_players = strategy.resolve_input(players, filtered_players)
             optimal_war, time_ms, memory_kib = profiler.profile(
-                solver_func, N, X, input_players, cost_unit
+                strategy.func, N, X, input_players, cost_unit
             )
+
             exporter.add_metric(
-                {
-                    "scenario": scenario.name,
-                    "N": N,
-                    "budget": X,
-                    "B": scenario.B,
-                    "P": P,
-                    "instance_size": scenario.instance_size,
-                    "algorithm": name,
-                    "optimal_war": optimal_war,
-                    "time_ms": time_ms,
-                    "memory_kib": memory_kib,
-                }
+                BenchmarkMetric(
+                    scenario=scenario.name,
+                    N=N,
+                    budget=X,
+                    B=scenario.B,
+                    P=P,
+                    instance_size=scenario.instance_size,
+                    algorithm=strategy.name,
+                    optimal_war=optimal_war,
+                    time_ms=time_ms,
+                    memory_kib=memory_kib,
+                )
             )
 
         # Esportazione matrici m ed s per ispezione
