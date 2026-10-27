@@ -11,8 +11,17 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{xcolor}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage[colorlinks=true, linkcolor=blue!70!black, citecolor=blue!70!black, urlcolor=blue!70!black]{hyperref}
+
+% Configurazione stile pseudocodice
+\algrenewcommand\algorithmicrequire{\textbf{Input:}}
+\algrenewcommand\algorithmicensure{\textbf{Output:}}
+\algrenewcommand{\algorithmiccomment}[1]{\hfill\textcolor{gray!80!black}{\textit{// #1}}}
 
 \graphicspath{{figures/}{../results/}}
 
@@ -20,5 +29,15 @@
 \maketitle
 
 \input{sections/01_compito1.tex}
+
+\begin{thebibliography}{9}
+\bibitem{clrs}
+T.~H.~Cormen, C.~E.~Leiserson, R.~L.~Rivest, C.~Stein,
+\textit{Introduction to Algorithms}, 3rd ed., MIT Press, Cambridge, MA, 2009.
+
+\bibitem{kellerer2004knapsack}
+H.~Kellerer, U.~Pferschy, D.~Pisinger,
+\textit{Knapsack Problems}, Springer, Berlin, Heidelberg, 2004.
+\end{thebibliography}
 
 \end{document}

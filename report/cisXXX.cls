@@ -24,7 +24,7 @@
 \NeedsTeXFormat{LaTeX2e}[2005/12/01]
 \ProvidesClass{cisXXX}[2016/07/05 CIS XXX Standard LaTeX document class]
 
-\LoadClass[a4paper, oneside, 11pt]{article}[2005/09/16]
+\LoadClass[a4paper, oneside, 10pt]{article}[2005/09/16]
 %% ============================================================
 
 %%
