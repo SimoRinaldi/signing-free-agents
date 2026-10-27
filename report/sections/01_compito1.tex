@@ -1,7 +1,7 @@
 \section{Compito 1}
 
 \subsection{Descrizione del problema}
-Il problema affrontato in questo elaborato consiste nell'ottimizzazione dell'ingaggio di giocatori per una squadra sportiva a budget limitato. Tale formulazione modella il tipico scenario decisionale affrontato dalla dirigenza di un club durante una sessione di calciomercato: la necessità di comporre la rosa più competitiva possibile rispettando vincoli di bilancio e di copertura dei ruoli.
+Il problema affrontato in questo elaborato consiste nell'ottimizzazione dell'ingaggio di giocatori per una squadra sportiva a budget limitato. Tale formulazione modella il tipico scenario decisionale affrontato dalla dirigenza (in particolare dal \textit{General Manager}) di una franchigia di baseball durante la sessione di mercato dei giocatori svincolati (\textit{free agency}): la necessità di comporre la rosa titolare più competitiva possibile rispettando vincoli finanziari di bilancio e di copertura dei ruoli sul diamante.
 
 In letteratura accademica, il problema è tratto dal testo di riferimento \textit{Introduction to Algorithms} (T.~H.~Cormen, C.~E.~Leiserson, R.~L.~Rivest, C.~Stein), in particolare dal Problema 15-12 (``Signing free-agent baseball players'') presente nel capitolo dedicato alla programmazione dinamica. Nella teoria dell'ottimizzazione combinatoria e della ricerca operativa, tale problema costituisce un'istanza canonica del Multiple-Choice Knapsack Problem (MCKP), variante specializzata del classico problema dello zaino (0/1 Knapsack) in cui gli oggetti sono partizionati in classi disgiunte e mutualmente esclusive.
 
@@ -10,14 +10,27 @@ L'istanza del problema riceve in ingresso un insieme strutturato di dati discret
 
 \begin{itemize}
     \item \textbf{Budget Totale ($B$):} un intero non negativo $B \in \mathbb{N}$ che rappresenta la disponibilità finanziaria massima spendibile per l'ingaggio complessivo dei componenti della squadra.
-    \item \textbf{Numero di Ruoli ($N$):} un intero positivo $N \in \mathbb{N}$ che definisce il numero complessivo di ruoli/reparti tecnici necessari alla formazione della squadra (es. portiere, difensore, centrocampista, attaccante). I ruoli sono indicizzati da $i = 1, 2, \dots, N$.
+    \item \textbf{Numero di Ruoli ($N$):} un intero positivo $N \in \mathbb{N}$ che definisce il numero complessivo di ruoli/reparti tecnici necessari alla formazione della squadra. Nel contesto del baseball si considerano i canonici $N = 9$ ruoli difensivi (es. lanciatore titolare -- \textit{Starting Pitcher}, ricevitore -- \textit{Catcher}, prima base -- \textit{First Base}, ecc.). I ruoli sono indicizzati da $i = 1, 2, \dots, N$.
     \item \textbf{Candidati per Ruolo ($P_i$):} per ciascun ruolo $i \in \{1, \dots, N\}$, è disponibile sul mercato un insieme finito di $P_i$ candidati svincolati, indicizzati con $k \in \{1, 2, \dots, P_i\}$.
-    \item \textbf{Parametri dei Giocatori:} ogni candidato $k$ appartenente al ruolo $i$ è univocamente caratterizzato da una coppia di parametri non negativi:
+    \item \textbf{Parametri dei Giocatori:} ogni candidato $k$ appartenente al ruolo $i$ è univocamente caratterizzato da una coppia di parametri:
     \begin{itemize}
-        \item $c_{i,k} \in \mathbb{N}$: costo d'acquisto/ingaggio del giocatore.
-        \item $v_{i,k} \in \mathbb{R}^+$ (o $\mathbb{N}$): valore tecnico atteso o metrica di rendimento del giocatore (corrispondente al parametro VORP -- \textit{Value Over Replacement Player} del testo di Cormen).
+        \item $c_{i,k} \in \mathbb{N}$: costo d'acquisto/ingaggio del giocatore sul mercato dei \textit{free agent}.
+        \item $v_{i,k} \in \mathbb{R}^+$: metrica di rendimento tecnico del giocatore, quantificata tramite la statistica sabermetrica \textbf{WAR} (\textit{Wins Above Replacement}).
     \end{itemize}
 \end{itemize}
+
+\subsubsection{La Metrica Sabermetrica WAR (Wins Above Replacement)}
+Nell'analisi statistica avanzata del baseball (\textit{sabermetrics}), il \textbf{WAR} (\textit{Wins Above Replacement}) rappresenta la metrica sintetica di riferimento per valutare il valore complessivo fornito da un atleta alla propria squadra. 
+
+Il concetto alla base del WAR è il confronto con il cosiddetto \textit{giocatore di livello rimpiazzo} (\textit{replacement-level player}), ovvero un atleta liberamente acquisibile sul mercato al salario minimo contrattuale o promosso dalle leghe minori (Minor League Baseball - MiLB), il cui rendimento incrementale è convenzionalmente posto pari a $0.0$. Un giocatore con un valore $\text{WAR} > 0$ esprime quante vittorie aggiuntive nel corso della stagione (composta da 162 incontri in MLB) la squadra ottiene schierando tale atleta rispetto a una riserva di livello rimpiazzo.
+
+Sebbene nel testo originale di Cormen et al. venga fatto riferimento alla metrica storica \textbf{VORP} (\textit{Value Over Replacement Player}), ideata originariamente per misurare i punti generati in battuta sopra il livello di rimpiazzo, nella moderna dirigenza sportiva e nel nostro modello si adotta il WAR, sua diretta e completa evoluzione. Il WAR integra organicamente ogni aspetto del gioco (battuta, corsa sulle basi, difesa sul campo e lanci).
+
+Sul piano dell'ottimizzazione combinatoria, l'adozione del WAR offre due proprietà teoriche ideali per il paradigma dinamico:
+\begin{enumerate}
+    \item \textbf{Linearità e Additività:} le vittorie sopra il rimpiazzo sono quantitativamente sommabili tra loro. Il WAR totale della rosa è esattamente dato dalla somma lineare dei contributi dei singoli atleti schierati.
+    \item \textbf{Coerenza del Livello Base (Costo Zero):} non ingaggiare alcuno svincolato in un dato ruolo corrisponde a impiegare la riserva già contrattualizzata a costo $0$ con apporto incrementale $\text{WAR} = 0.0$, garantendo la perfetta rispondenza con il caso base dell'algoritmo.
+\end{enumerate}
 
 \subsection{Vincoli del Problema}
 Una selezione di giocatori è considerata ammissibile se e solo se soddisfa simultaneamente i seguenti due vincoli operativi:
@@ -52,7 +65,7 @@ Il problema si qualifica come un problema di massimizzazione vincolata.
 
     \item \textbf{Output Richiesto:} conformemente alle specifiche di progetto, la risoluzione deve produrre:
     \begin{enumerate}
-        \item \textbf{Il valore scalare ottimo}, ovvero il massimo VORP complessivo conseguibile senza violare il vincolo finanziario.
+        \item \textbf{Il valore scalare ottimo}, ovvero il massimo WAR complessivo conseguibile senza violare il vincolo finanziario.
         \item \textbf{La configurazione ottima} (la rosa definitiva), descritta mediante l'elenco esatto dei giocatori scelti ruolo per ruolo che realizzano tale rendimento.
     \end{enumerate}
 \end{itemize}
@@ -130,4 +143,144 @@ Nel passo ricorsivo:
 \begin{itemize}
     \item il primo termine $m[i - 1, b]$ rappresenta la scelta di non ingaggiare alcun giocatore per il ruolo $i$ (mantenendo inalterato il WAR conseguito sui primi $i-1$ ruoli senza consumare budget aggiuntivo);
     \item il secondo termine valuta l'opzione di ingaggiare il miglior candidato $j$ tra i $P$ disponibili per il ruolo $i$, a patto che il suo costo scalato $c_{i, j}$ non ecceda il budget residuo $b$.
+\end{itemize}
+
+\subsection{Pseudocodici degli Algoritmi Fondamentali}
+In conformità a quanto richiesto dalle specifiche progettuali, presentiamo di seguito gli pseudocodici formali per i due algoritmi risolutivi fondamentali:
+\begin{enumerate}
+    \item \textbf{Calcolo del valore ottimo}: un algoritmo iterativo \textit{bottom-up} che calcola il massimo WAR realizzabile memorizzando i risultati parziali nella tabella $m$ e tracciando le scelte effettuate nella tabella ausiliaria $s$.
+    \item \textbf{Ricostruzione della soluzione ottima}: un algoritmo che sfrutta le informazioni memorizzate nella tabella $s$ per estrarre la composizione esatta della rosa ottima e il costo cumulativo finale.
+\end{enumerate}
+
+\subsubsection{Algoritmo 1: Calcolo del Valore Ottimo e Tabella delle Scelte}
+L'Algoritmo~\ref{alg:compute_optimal_war} opera secondo una strategia di popolamento tabellare progressivo. Le righe della tabella corrispondono ai ruoli considerati ($i = 0, \dots, N$), mentre le colonne corrispondono ai valori discreti di budget ammissibili ($b = 0, \dots, B$).
+
+\begin{algorithm}[H]
+\caption{Calcolo del WAR Ottimale e della Tabella delle Scelte}
+\label{alg:compute_optimal_war}
+\begin{algorithmic}[1]
+\Procedure{Compute-Optimal-War}{$N, X, P, \mathit{players}$}
+    \State $\text{COST\_UNIT} \gets 100\,000$
+    \State $B \gets \lfloor X / \text{COST\_UNIT} \rfloor$
+    \State alloca la matrice $m[0 \dots N, 0 \dots B]$ inizializzata a $0.0$
+    \State alloca la matrice $s[0 \dots N, 0 \dots B]$ inizializzata a $-1$
+    \For{$i \gets 1$ \textbf{to} $N$} \Comment{Considera ciascun ruolo difensivo}
+        \State $m[i, 0 \dots B] \gets m[i - 1, 0 \dots B]$ \Comment{Scelta base: mantieni il rendimento precedente}
+        \For{$j \gets 0$ \textbf{to} $P - 1$} \Comment{Esamina ciascun candidato disponibile per il ruolo $i$}
+            \State $p \gets \mathit{players}[i - 1, j]$
+            \State $c \gets \lfloor p.\mathit{cost} / \text{COST\_UNIT} \rfloor$
+            \For{$b \gets c$ \textbf{to} $B$} \Comment{Aggiorna gli stati in cui il budget residuo è sufficiente}
+                \State $\mathit{war} \gets m[i - 1, b - c] + p.\mathit{war}$
+                \If{$\mathit{war} > m[i, b]$}
+                    \State $m[i, b] \gets \mathit{war}$
+                    \State $s[i, b] \gets j$ \Comment{Memorizza l'indice del giocatore selezionato}
+                \EndIf
+            \EndFor
+        \EndFor
+    \EndFor
+    \State $\mathit{optimal\_war} \gets m[N, B]$
+    \State \textbf{return} $\mathit{optimal\_war}, s$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsubsection{Algoritmo 2: Ricostruzione della Soluzione Ottima}
+L'Algoritmo~\ref{alg:reconstruct_optimal_roster} ricostruisce l'elenco dei giocatori ingaggiati effettuando un percorso a ritroso (\textit{backtracking}) a partire dalla cella di arrivo $(N, B)$ della matrice delle decisioni $s$.
+
+\begin{algorithm}[H]
+\caption{Ricostruzione della Rosa Ottima}
+\label{alg:reconstruct_optimal_roster}
+\begin{algorithmic}[1]
+\Procedure{Reconstruct-Optimal-Roster}{$N, X, \mathit{players}, s$}
+    \State $\text{COST\_UNIT} \gets 100\,000$
+    \State $b \gets \lfloor X / \text{COST\_UNIT} \rfloor$
+    \State $\mathit{signedPlayers} \gets$ nuova lista vuota
+    \State $\mathit{totalCost} \gets 0$
+    \For{$i \gets N$ \textbf{downto} $1$} \Comment{Ripercorre le decisioni dall'ultimo ruolo al primo}
+        \State $\mathit{index} \gets s[i, b]$
+        \If{$\mathit{index} \neq -1$} \Comment{Un giocatore svincolato è stato effettivamente ingaggiato}
+            \State $p \gets \mathit{players}[i - 1, \mathit{index}]$
+            \State inserisci $p$ in $\mathit{signedPlayers}$
+            \State $\mathit{totalCost} \gets \mathit{totalCost} + p.\mathit{cost}$
+            \State $b \gets b - \lfloor p.\mathit{cost} / \text{COST\_UNIT} \rfloor$ \Comment{Scala il costo dal budget residuo}
+        \EndIf
+    \EndFor
+    \State \textbf{return} $\mathit{signedPlayers}, \mathit{totalCost}$
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Analisi Asintotica Teorica del Primo Algoritmo}
+L'analisi asintotica formale dell'Algoritmo~\ref{alg:compute_optimal_war} viene condotta valutando separatamente la complessità temporale, l'occupazione di memoria (complessità spaziale) e la classe di complessità teorica dell'approccio proposto.
+
+\subsubsection{Complessità Temporale}
+Il tempo di esecuzione dell'algoritmo è determinato dalle seguenti fasi:
+\begin{enumerate}
+    \item \textbf{Fase di inizializzazione}: l'allocazione e l'azzeramento delle due matrici $m$ ed $s$ di dimensioni $(N + 1) \times (B + 1)$ richiedono:
+    \[
+    T_{\text{init}} = \Theta(N \cdot B)
+    \]
+    \item \textbf{Fase di calcolo iterativo (cicli principali)}:
+    \begin{itemize}
+        \item Il ciclo più esterno (linea 6) viene eseguito esattamente $N$ volte, per $i = 1, \dots, N$.
+        \item All'inizio di ogni iterazione del ruolo $i$, la copia del vettore base dallo stage precedente $m[i-1, 0 \dots B]$ (linea 7) comporta $B + 1$ assegnamenti, pari a $\Theta(B)$ operazioni elementari.
+        \item Il secondo ciclo (linea 8) itera sui $P$ candidati disponibili per il ruolo $i$.
+        \item Per ogni candidato $j$, il ciclo più interno sul budget (linea 11) viene eseguito per $b$ che varia da $c$ a $B$, compiendo esattamente $B - c + 1$ iterazioni. Poiché nel caso peggiore $c \ge 0$, tale ciclo compie al più $B + 1$ iterazioni.
+        \item All'interno del ciclo più interno, il calcolo del valore candidato, il confronto con il valore corrente e l'eventuale aggiornamento delle matrici $m[i, b]$ e $s[i, b]$ (linee 12--15) richiedono tempo costante $\Theta(1)$.
+    \end{itemize}
+\end{enumerate}
+
+Sommando i contributi per tutti i ruoli e candidati, il numero complessivo di operazioni elementari $T(N, B, P)$ è formalmente delimitato da:
+\[
+T(N, B, P) = \Theta(N \cdot B) + \sum_{i=1}^N \left( \Theta(B) + \sum_{j=0}^{P-1} \sum_{b=c_{i,j}}^B \Theta(1) \right)
+\]
+Poiché $0 \le c_{i,j} \le B$, il termine $\sum_{b=c_{i,j}}^B \Theta(1) \le (B + 1) \cdot \Theta(1) = \Theta(B)$. Dunque:
+\[
+T(N, B, P) = \Theta(N \cdot B) + \sum_{i=1}^N \Big( \Theta(B) + P \cdot \Theta(B) \Big) = \Theta(N \cdot B) + \Theta(N \cdot B \cdot P) = \Theta(N \cdot B \cdot P)
+\]
+Nel caso generale in cui il numero di candidati $P_i$ vari ruolo per ruolo, la complessità temporale si esprime più precisamente come:
+\[
+T\left(N, B, \{P_i\}\right) = \Theta\left(B \sum_{i=1}^N P_i\right)
+\]
+che, assumendo $P_i = P$ costante per ogni posizione, coincide esattamente con $\Theta(N \cdot B \cdot P)$.
+
+\subsubsection{Occupazione di Memoria (Complessità Spaziale)}
+L'occupazione di memoria dell'algoritmo è dominata dalle strutture dati allocate per il mantenimento dello stato dinamico:
+\begin{itemize}
+    \item La matrice dei valori $m$ ha dimensioni $(N + 1) \times (B + 1)$. Ciascuna cella memorizza un numero in virgola mobile a precisione doppia (\texttt{float64}, 8 byte) che rappresenta il WAR cumulativo ottimo parziale.
+    \item La matrice delle decisioni $s$ ha anch'essa dimensioni $(N + 1) \times (B + 1)$. Ciascuna cella memorizza un indice intero (\texttt{int}, 4 o 8 byte) corrispondente al candidato prescelto (oppure $-1$ per indicare l'assenza di ingaggi).
+    \item Le variabili scalari ausiliarie ($N, X, B, P, i, j, b, c, \mathit{war}$) richiedono una quantità di memoria indipendente dalla taglia dell'istanza, pari a $O(1)$.
+\end{itemize}
+La complessità spaziale complessiva per l'esecuzione del primo algoritmo è pertanto:
+\[
+S(N, B) = 2 \times (N + 1) \times (B + 1) \cdot O(1) = \Theta(N \cdot B)
+\]
+Si noti che l'occupazione di memoria dell'Algoritmo~\ref{alg:compute_optimal_war} è completamente indipendente dal numero di candidati per ruolo $P$, dipendendo unicamente dal numero di ruoli $N$ e dal budget discretizzato $B$.
+
+\subsubsection{Discussione sulla Pseudo-Polinomialità}
+Una considerazione teorica fondamentale, richiesta dall'analisi della complessità computazionale, riguarda la natura della complessità riscontrata:
+\begin{quote}
+\textit{L'algoritmo proposto presenta una complessità temporale $\Theta(N \cdot B \cdot P)$ e spaziale $\Theta(N \cdot B)$ che si qualificano come \textbf{pseudo-polinomiali}.}
+\end{quote}
+
+Formalmente, la teoria della complessità misura l'efficienza di un algoritmo non rispetto al valore numerico delle grandezze in ingresso, bensì rispetto alla \textbf{lunghezza della codifica in bit dell'input} (detta dimensione dell'istanza). 
+
+Nel nostro problema, il parametro $B$ rappresenta un valore numerico la cui rappresentazione binaria richiede un numero di bit pari a:
+\[
+L_B = \lfloor \log_2 B \rfloor + 1
+\]
+Di conseguenza, il valore numerico $B$ è esponenziale rispetto al numero di bit necessari per memorizzarlo:
+\[
+B = \Theta(2^{L_B})
+\]
+Esprimendo la complessità temporale in funzione della dimensione dell'input in bit, si ottiene:
+\[
+T(N, L_B, P) = \Theta(N \cdot 2^{L_B} \cdot P)
+\]
+L'algoritmo manifesta una dipendenza esponenziale dalla lunghezza della codifica del budget $B$. Pertanto, non si tratta di un algoritmo polinomiale in senso stretto. 
+
+Questa proprietà colloca il Multiple-Choice Knapsack Problem (MCKP), analogamente al classico problema dello zaino 0/1 (Knapsack) e al Subset Sum, nella classe dei problemi \textbf{NP-hard in senso debole} (\textit{weakly NP-hard}):
+\begin{itemize}
+    \item l'algoritmo risulta estremamente efficiente e trattabile nella pratica fintanto che il budget scalato $B$ si mantiene di entità moderata;
+    \item la complessità computazionale e l'occupazione di memoria degradano rapidamente verso l'intrattabilità qualora il budget assuma ordini di grandezza arbitrariamente elevati o qualora si scelga una scala monetaria infinitesima ($\text{COST\_UNIT} \to 1$).
 \end{itemize}
