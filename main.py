@@ -55,9 +55,9 @@ def main():
         cost_unit = scenario.cost_unit
         P = scenario.P
 
+        demo_tag = " (demo)" if "scenario_00" in scenario.name else ""
         print(
-            f"[{idx:02d}/{total_scenarios:02d}] {scenario.name} "
-            f"(N={N}, B={scenario.B}, P={P}) ... ",
+            f"[{idx:02d}/{total_scenarios:02d}] {scenario.name}{demo_tag} ... ",
             end="",
             flush=True,
         )
