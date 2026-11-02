@@ -1,0 +1,119 @@
+\section{Istanze, Varianti e Confronto Benchmark}
+
+\subsection{Caratterizzazione delle Istanze di Test}
+Per sottoporre a una valutazione empirica rigorosa gli algoritmi risolutivi e le relative varianti, è stato predisposto un insieme di istanze di prova strutturato attorno a dati realistici provenienti dal mondo del baseball professionistico (\textit{MLB}). La scelta di attingere a dati reali risponde all'obiettivo di testare il comportamento delle procedure non solo su distribuzioni sintetiche o puramente teoriche, ma su valori contrattuali e indicatori di rendimento che riflettono fedelmente le dinamiche decisionali del problema originario.
+
+\subsubsection{Composizione del Dataset e Ruoli Difensivi}
+Nel rispetto della formulazione del problema esposta nel Compito~1, ciascuna istanza considera la copertura dei canonici $N = 9$ ruoli difensivi del baseball:
+\begin{enumerate}
+	\item \textit{Starting Pitcher} (lanciatore partente);
+	\item \textit{Relief Pitcher} (lanciatore di rilievo);
+	\item \textit{Catcher} (ricevitore);
+	\item \textit{First Base} (prima base);
+	\item \textit{Second Base} (seconda base);
+	\item \textit{Third Base} (terza base);
+	\item \textit{Shortstop} (interbase);
+	\item \textit{Outfielder} (esterno);
+	\item \textit{Designated Hitter} (battitore designato).
+\end{enumerate}
+Per ciascuno dei 9 ruoli è disponibile un contingente omogeneo di $P = 30$ candidati svincolati, per un totale complessivo di $N \times P = 270$ atleti presenti nel bacino di mercato.
+
+Ciascun atleta $k \in \{1, \dots, P\}$ all'interno del ruolo $i \in \{1, \dots, N\}$ è formalmente caratterizzato da una tripla di attributi:
+\begin{equation}
+	p_{i, k} = \big( \mathit{name}_{i, k}, \; \mathit{cost}_{i, k}, \; v_{i, k} \big)
+\end{equation}
+dove $\mathit{cost}_{i, k} \in \mathbb{N}^+$ rappresenta il compenso contrattuale lordo (con valori compresi tra poche centinaia di migliaia di dollari fino a decine di milioni di dollari), mentre $v_{i, k} = \text{WAR} \ge 0$ rappresenta il contributo marginale del giocatore alle vittorie stagionali attese della squadra rispetto al livello di rimpiazzo.
+
+\subsubsection{Generazione e Parametrizzazione degli Scenari}
+Per analizzare sistematicamente la crescita del tempo di esecuzione e del consumo di memoria primaria, sono stati generati 10 scenari incrementali di test, denominati da \texttt{scenario\_11\_N9\_B3500\_P30} a \texttt{scenario\_20\_N9\_B8000\_P30}.
+
+Nella progettazione della campagna sperimentale si è scelto di mantenere fisso il numero di atleti disponibili (confermati a $N = 9$ e $P = 30$ per tutte le istanze) e di far variare esclusivamente il budget nominale $X$. Il budget parte da un valore base di $\$350\,000\,000$ nello scenario 11 e cresce con incremento lineare e uniforme di $\$50\,000\,000$ per ciascuno scenario successivo, attestandosi infine a $\$800\,000\,000$ nello scenario 20.
+
+Di conseguenza, il budget discreto associato varia progressivamente nell'intervallo:
+\begin{equation}
+	B \in \{3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000\}
+\end{equation}
+La complessità di un'istanza nell'approccio dinamico è determinata dal prodotto delle tre dimensioni cardinali del problema, formalizzata dalla metrica:
+\begin{equation}
+	\text{instance\_size} = N \cdot B \cdot P
+\end{equation}
+Tale grandezza rappresenta l'esatto numero di transizioni valutate dal ciclo più interno della formulazione bottom-up classica. All'interno della suite di test, la dimensione dell'istanza cresce linearmente con pendenza costante da $945\,000$ fino a oltre $2\,160\,000$ operazioni elementari.
+
+In Tabella~\ref{tab:scenarios_overview} vengono dettagliati i parametri operativi di ciascuno dei 10 scenari generati.
+
+\begin{table}[!htbp]
+	\centering
+	\small
+	\caption{Caratteristiche e Parametri delle Istanze di Test Generate}
+	\label{tab:scenarios_overview}
+	\begin{tabular}{lcccccc}
+		\toprule
+		\textbf{Identificativo Scenario} & $N$ & $P$ & \textbf{Budget Nominale ($X$)} & $B$ & \textbf{Dimensione ($N \cdot B \cdot P$)} \\
+		\midrule
+		\texttt{scenario\_11\_N9\_B3500\_P30} & 9 & 30 & $\$350\,000\,000$ & 3500 & $945\,000$ \\
+		\texttt{scenario\_12\_N9\_B4000\_P30} & 9 & 30 & $\$400\,000\,000$ & 4000 & $1\,080\,000$ \\
+		\texttt{scenario\_13\_N9\_B4500\_P30} & 9 & 30 & $\$450\,000\,000$ & 4500 & $1\,215\,000$ \\
+		\texttt{scenario\_14\_N9\_B5000\_P30} & 9 & 30 & $\$500\,000\,000$ & 5000 & $1\,350\,000$ \\
+		\texttt{scenario\_15\_N9\_B5500\_P30} & 9 & 30 & $\$550\,000\,000$ & 5500 & $1\,485\,000$ \\
+		\texttt{scenario\_16\_N9\_B6000\_P30} & 9 & 30 & $\$600\,000\,000$ & 6000 & $1\,620\,000$ \\
+		\texttt{scenario\_17\_N9\_B6500\_P30} & 9 & 30 & $\$650\,000\,000$ & 6500 & $1\,755\,000$ \\
+		\texttt{scenario\_18\_N9\_B7000\_P30} & 9 & 30 & $\$700\,000\,000$ & 7000 & $1\,890\,000$ \\
+		\texttt{scenario\_19\_N9\_B7500\_P30} & 9 & 30 & $\$750\,000\,000$ & 7500 & $2\,025\,000$ \\
+		\texttt{scenario\_20\_N9\_B8000\_P30} & 9 & 30 & $\$800\,000\,000$ & 8000 & $2\,160\,000$ \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\subsubsection{Formato di Serializzazione e Struttura dei Dati}
+Per garantire modularità, manutenibilità e riproducibilità degli esperimenti, ciascuna istanza è archiviata all'interno della cartella \texttt{scenarios/} come file autonomo in formato JSON. La separazione fisica tra la definizione dei dati di input e il codice degli algoritmi consente di modificare, estendere o aggiungere scenari senza dover alterare i moduli software.
+
+La struttura di ciascun file JSON è articolata nei seguenti campi:
+\begin{itemize}
+	\item \texttt{scenario\_name}: stringa univoca identificativa dello scenario;
+	\item \texttt{budget}: valore numerico intero del budget finanziario nominale $X$;
+	\item \texttt{cost\_unit}: fattore di scala per la discretizzazione intera ($100\,000$);
+	\item \texttt{roles}: vettore di $N$ oggetti, ciascuno rappresentante un ruolo difensivo e contraddistinto dal nome del ruolo (\texttt{role\_name}) e dalla lista dei $P$ atleti candidati (\texttt{candidates}). Ciascun elemento di tale lista riporta il nome del giocatore (\texttt{name}), il costo contrattuale lordo (\texttt{cost}) e il punteggio (\texttt{war}).
+\end{itemize}
+
+All'avvio dell'applicazione, il modulo \texttt{loader.py} esegue il parsing del documento JSON convertendolo negli oggetti immutabili \texttt{Scenario}, \texttt{Role} e \texttt{Player} definiti in \texttt{models.py}, validando preventivamente l'integrità dei parametri prima dell'invocazione degli algoritmi risolutivi.
+
+\subsection{Varianti Algoritmiche Implementate}
+
+\subsubsection{Variante Salvaspazio a Vettore Singolo 1D}
+Nell'algoritmo classico, per calcolare il valore ottimo si usa una tabella con $N+1$ righe e $B+1$ colonne, occupando uno spazio in memoria pari a $\Theta(N \cdot B)$. Tuttavia, quando si calcolano i valori per il ruolo $i$, servono solo ed esclusivamente i valori del ruolo precedente $i-1$. Non serve quindi conservare tutta la storia delle righe precedenti: basta usare un unico vettore di dimensione $B+1$.
+
+Il punto chiave di questa variante è la direzione del ciclo sul budget, che deve andare obbligatoriamente \textbf{all'indietro, da $B$ verso $0$}:
+\begin{itemize}
+	\item Se scorressimo il budget in avanti (da $0$ a $B$), quando aggiorniamo una cella con budget $b$ usando il valore alla posizione $b - c$, rischieremmo di leggere un valore già modificato per lo stesso ruolo $i$. Questo permetterebbe all'algoritmo di scegliere più giocatori per lo stesso ruolo (o lo stesso giocatore più volte), violando la regola che impone al massimo un acquisto per ruolo.
+	\item Scorrendo invece il budget all'indietro (da $B$ a $0$), quando andiamo a leggere la cella $b - c$, quella posizione non è ancora stata toccata per il ruolo $i$ e contiene ancora il valore del ruolo precedente $i-1$. In questo modo siamo sicuri che ogni giocatore venga considerato al massimo una volta per il suo ruolo.
+\end{itemize}
+
+Il codice Python implementato in \texttt{src/algorithms/space\_optimized.py} è il seguente:
+
+\begin{lstlisting}
+def compute_optimal_war_with_one_vector(N, X, players, cost_unit=100000):
+    B = floor(X / cost_unit)
+    solution = [0.0 for _ in range(B + 1)]
+
+    for i in range(1, N + 1):
+        for b in range(B, -1, -1):
+            best_war = solution[b]
+
+            for p in players[i - 1]:
+                c = p.cost // cost_unit
+                war_p = p.war
+
+                if b >= c:
+                    war = solution[b - c] + war_p
+                    if war > best_war:
+                        best_war = war
+
+            solution[b] = best_war
+
+    optimal_war = solution[B]
+    return optimal_war
+\end{lstlisting}
+
+Il tempo di calcolo rimane invariato ($\Theta(N \cdot B \cdot P)$), perché il numero di controlli da fare è lo stesso. Il vantaggio sta nella memoria, che scende da $\Theta(N \cdot B)$ a \textbf{$\Theta(B)$}, diventando del tutto indipendente dal numero di ruoli $N$.
+
+L'unico compromesso di questo approccio è che, sovrascrivendo i valori riga dopo riga nello stesso vettore, alla fine dell'esecuzione si perde la traccia delle scelte fatte e non è possibile ricostruire quali specifici giocatori compongono la rosa ottima.
