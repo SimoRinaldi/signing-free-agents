@@ -36,9 +36,9 @@ def get_benchmark_strategies() -> List[SolverStrategy]:
     ]
 
 
-def main():
+def run_all_scenarios(repetitions: int = 15):
     scenarios_dir = Path("scenarios")
-    profiler = PerformanceProfiler(repetitions=15)
+    profiler = PerformanceProfiler(repetitions=repetitions)
     exporter = DataExporter(output_dir="results")
 
     scenario_files = sorted(
@@ -47,7 +47,11 @@ def main():
 
     strategies = get_benchmark_strategies()
     total_scenarios = len(scenario_files)
-    print(f"\nAvvio benchmark su {total_scenarios} scenari in '{scenarios_dir}/'...\n")
+
+    print("Avvio sperimentazione e misurazione delle prestazioni")
+    print(f"     Scenari in esame: {total_scenarios} istanze a budget crescente")
+    print(f"     Varianti testate: {len(strategies)}")
+    print(f"     Ripetizioni per scenario: {repetitions}\n")
 
     for idx, file_path in enumerate(scenario_files, 1):
         scenario = load_scenario(file_path)
@@ -100,15 +104,16 @@ def main():
 
     # Salvataggio metriche su CSV
     csv_metrics_path = exporter.export_metrics_to_csv("benchmark_metrics.csv")
-    print(f"\nMetriche salvate in '{csv_metrics_path}'")
 
     # Generazione dei grafici e della tabella comparativa PNG
     plotter = PerformancePlotter(show_plots=False)
-    generated_files = plotter.plot_all()
-    print("Grafici e tabella generati in 'results/':")
-    for f in generated_files:
-        print(f"  - {f.name}")
+    plotter.plot_all()
 
+    print("\nElaborazione completata con successo!")
+    print("Risultati e grafici salvati con successo!")
+
+def main():
+    run_all_scenarios()
 
 if __name__ == "__main__":
     main()

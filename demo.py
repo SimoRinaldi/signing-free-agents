@@ -35,10 +35,9 @@ def pause():
 
 
 def print_header(scenario):
-    """Pulisce lo schermo e stampa l'intestazione fissa con i dati dello scenario."""
     clear_screen()
-    print("PROGETTO ALGORITMI: SIGNING FREE-AGENT PLAYERS")
-    print(f"Scenario: {scenario.name} | Ruoli (N)={scenario.N} | Budget (B)={scenario.B} (${scenario.budget:,.0f}) | Candidati (P)={scenario.P}\n")
+    print("\033[1;34mMENU - Signing Free-Agent Players\033[0m\n")
+    print(f"\033[1;36m{scenario.name}\033[0m | Ruoli N={scenario.N} | Budget B=${scenario.budget:,.0f} | Candidati P={scenario.P}\033[0m\n")
 
 
 def open_file_in_os(filepath):
@@ -68,9 +67,8 @@ def get_available_scenarios():
     return sorted(scenarios_dir.glob("*.json"))
 
 
-def print_roster_dataframe(scenario, solution: RosterSolution):
-    """Formatta e stampa la rosa ottimale usando la classe RosterSolution."""
-    print("ROSA TITOLARE OTTIMALE:\n")
+def print_roster(scenario, solution: RosterSolution):
+    print("ROSA OTTIMALE:\n")
 
     players_by_role = {}
     for p in solution.players:
@@ -79,8 +77,8 @@ def print_roster_dataframe(scenario, solution: RosterSolution):
                 players_by_role[r.name] = p
                 break
 
-    headers = ["Ruolo", "Giocatore Ingaggiato", "Costo ($)", "WAR"]
-    alignments = ["left", "left", "right", "right"]
+    headers = ["Ruolo", "Giocatore ingaggiato", "Costo ($)", "WAR"]
+    alignments = ["center", "center", "center", "center"]
     rows = []
 
     for r in scenario.roles:
@@ -93,82 +91,43 @@ def print_roster_dataframe(scenario, solution: RosterSolution):
     print(exporter.format_box_table(headers, rows, alignments))
 
     percentuale_spesa = (solution.total_cost / scenario.budget) * 100 if scenario.budget > 0 else 0
-    print(f"\nRiepilogo Economico:")
-    print(f"  • Valore Ottimo (WAR Totale):   ★ {solution.optimal_war:.1f} (valore della cella m[N, B])")
-    print(f"  • Budget Iniziale:          ${scenario.budget:,.0f}")
-    print(f"  • Spesa Effettiva:          ${solution.total_cost:,.0f} ({percentuale_spesa:.1f}% del budget)")
-    print(f"  • Budget Residuo:           ${scenario.budget - solution.total_cost:,.0f}")
+    print(f"\nRiepilogo:")
+    print(f"  • WAR ottimo:               ${solution.optimal_war:.1f}")
+    print(f"  • Budget iniziale:          ${scenario.budget:,.0f}")
+    print(f"  • Spesa effettiva:          ${solution.total_cost:,.0f} ({percentuale_spesa:.1f}% del budget)")
+    print(f"  • Budget residuo:           ${scenario.budget - solution.total_cost:,.0f}")
 
 
-def print_matrices_dataframe(scenario, m, s):
-    """Formatta e stampa le matrici m ed s evidenziando il valore ottimo e il passo di ricostruzione."""
-    role_labels = ["Base (i=0)"] + [f"{r.name} (i={idx})" for idx, r in enumerate(scenario.roles, 1)]
+def print_matrices(scenario, m, s):
     max_cols = 10
     limit_cols = min(scenario.B + 1, max_cols)
     col_labels = [f"b={b}" for b in range(limit_cols)]
 
+    role_labels_m = [""] + [
+        f"{r.name}" for _, r in enumerate(scenario.roles, 1)
+    ] 
+
+    role_labels_s = [""] + [
+        f"{r.name} ({idx})" for idx, r in enumerate(scenario.roles, 1)
+    ] 
+
     if scenario.B >= max_cols:
-        print(f"[Nota: Budget B={scenario.B} elevato; visualizzazione limitata alle prime {limit_cols} colonne]")
-        print(f"[La matrice integrale di {scenario.N + 1}×{scenario.B + 1} celle è disponibile in results/matrice_m_{scenario.name}.csv]\n")
+        print(f"[Nota: Budget B={scenario.B} elevato; visualizzazione limitata alle prime {limit_cols} colonne]\n")
 
     m_sub = [row[:limit_cols] for row in m]
     s_sub = [row[:limit_cols] for row in s]
 
-    # Se l'intera matrice rientra a video, evidenziamo l'angolo in basso a destra (N, B)
-    highlight = (scenario.N, scenario.B) if scenario.B < max_cols else None
+    highlight_m = (scenario.N, scenario.B) if scenario.B < max_cols else None
 
-    print("Matrice dei Valori Ottimi (m):")
-    print(exporter.format_matrix(m_sub, row_labels=role_labels, col_labels=col_labels, highlight_cell=highlight))
+    print("Matrice m:")
+    print(exporter.format_matrix(m_sub, row_labels=role_labels_m, col_labels=col_labels, highlight_cell=highlight_m))
 
-    print("\nMatrice delle Decisioni (s) [-1 = nessun acquisto]:")
-    print(exporter.format_matrix(s_sub, row_labels=role_labels, col_labels=col_labels, highlight_cell=highlight))
-
-    optimal_war = m[scenario.N][scenario.B]
-    s_val = s[scenario.N][scenario.B]
-    last_role = scenario.roles[scenario.N - 1]
-
-    print("\n" + "=" * 74)
-    print("★ INTERPRETAZIONE E LOCALIZZAZIONE DEL VALORE OTTIMO (Compito 1 e 2):")
-    print("=" * 74)
-    if scenario.B < max_cols:
-        print(f"1. VALORE OTTIMO GLOBALE: cella m[N, B] = m[{scenario.N}, {scenario.B}] = {optimal_war:.1f} WAR")
-        print(f"   • Collocazione: angolo in basso a destra della tabella m (evidenziata con '★ {optimal_war:.1f}').")
-        print(f"   • Significato: rappresenta il massimo WAR ottenibile considerando tutti gli N={scenario.N} ruoli")
-        print(f"     con il budget complessivo a disposizione B={scenario.B} (${scenario.budget:,.0f}).")
-        print()
-        print(f"2. PUNTO DI PARTENZA RICOSTRUZIONE: cella s[N, B] = s[{scenario.N}, {scenario.B}] = {s_val}")
-        print(f"   • Collocazione: angolo in basso a destra della tabella s (evidenziata con '★ {s_val}').")
-        print(f"   • La procedura 'Reconstruct-Optimal-Roster' risale a ritroso esattamente da qui:")
-        if s_val >= 0:
-            cand = last_role.candidates[s_val]
-            scaled_cost = int(cand.cost / scenario.cost_unit)
-            rem_b = scenario.B - scaled_cost
-            prev_role_name = scenario.roles[scenario.N - 2].name if scenario.N > 1 else "Base"
-            print(f"     - Per il ruolo {scenario.N} ({last_role.name}) è stato ingaggiato il candidato #{s_val}:")
-            print(f"       '{cand.name}' (costo: ${cand.cost:,.0f}, WAR: +{cand.war:.1f});")
-            print(f"     - Il budget residuo per i ruoli precedenti diventa: b = {scenario.B} - {scaled_cost} = {rem_b};")
-            print(f"     - L'algoritmo passa quindi alla riga precedente i={scenario.N - 1} ({prev_role_name}) alla colonna b={rem_b},")
-            print(f"       proseguendo all'indietro fino alla riga base (i=0).")
-        else:
-            print(f"     - Per il ruolo {scenario.N} ({last_role.name}) nessun giocatore è stato ingaggiato (s=-1);")
-            print(f"     - Il budget residuo resta b = {scenario.B}, passando alla riga precedente i={scenario.N - 1}.")
-    else:
-        print(f"1. VALORE OTTIMO GLOBALE: cella m[N, B] = m[{scenario.N}, {scenario.B}] = {optimal_war:.1f} WAR")
-        print(f"   • Collocazione: si trova all'angolo terminale in basso a destra dell'intera matrice:")
-        print(f"     riga i={scenario.N} ({last_role.name}), colonna b={scenario.B} (${scenario.budget:,.0f}).")
-        print(f"   • Nota: data la dimensione di B={scenario.B}, a video sono mostrate solo le prime {limit_cols} colonne.")
-        print(f"     La matrice completa di tutte le {scenario.N + 1}×{scenario.B + 1} celle è ispezionabile in:")
-        print(f"     'results/matrice_m_{scenario.name}.csv'")
-        print()
-        print(f"2. RICOSTRUZIONE DELLA ROSA: cella s[N, B] = s[{scenario.N}, {scenario.B}] = {s_val}")
-        print(f"   • La procedura a ritroso 'Reconstruct-Optimal-Roster' parte dalla cella terminale s[{scenario.N}, {scenario.B}]")
-        print(f"     e scala i ruoli fino a i=0 per determinare la formazione completa.")
-    print("=" * 74)
+    print("\nMatrice s (-1 = nessun acquisto):")
+    print(exporter.format_matrix(s_sub, row_labels=role_labels_s, col_labels=col_labels, highlight_cell=None))
 
 
-def run_coherence_comparison(scenario):
-    """Confronta tutte le varianti algoritmiche dimostrando la coerenza del risultato."""
-    print("CONFRONTO TRA VARIANTI E VERIFICA DI COERENZA:\n")
+def run_variants_comparison(scenario):
+    print("CONFRONTO TRA VARIANTI ALGORITMICHE:\n")
     N, X, players = scenario.N, scenario.budget, scenario.get_players_matrix()
     cost_unit = scenario.cost_unit
 
@@ -186,19 +145,23 @@ def run_coherence_comparison(scenario):
     # 4. Top-Down ricorsivo
     opt_war_td = compute_optimal_war_with_recursion(N, X, players, cost_unit)
 
-    # 5. Bottom-up con Filtro di Pareto
+    # 5. Bottom-up con filtro
     filtered = filter_players(players, cost_unit, scenario.B)
     opt_war_filter, m_fil = compute_optimal_war_without_s(N, X, filtered, cost_unit)
     roster_fil, cost_fil = reconstruct_optimal_roster_without_s(N, X, filtered, m_fil, cost_unit)
 
-    headers = ["Variante Algoritmica", "WAR Ottimo", "Spesa Totale", "Acquisti"]
-    alignments = ["left", "right", "right", "center"]
+    # 6. Bottom-up vettore singolo + filtro
+    opt_war_filter_vec = compute_optimal_war_with_one_vector(N, X, filtered, cost_unit)
+
+    headers = ["", "WAR ottimo", "Spesa totale", "Acquisti"]
+    alignments = ["center", "center", "center", "center"]
     rows = [
         ["Bottom-Up (con matrice s)", f"{opt_war_s:.1f}", f"${cost_s:,.0f}", str(len(roster_s))],
         ["Bottom-Up (solo matrice m)", f"{opt_war_no_s:.1f}", f"${cost_no_s:,.0f}", str(len(roster_no_s))],
-        ["Bottom-Up (vettore singolo)", f"{opt_war_vec:.1f}", "(solo valore)", "-"],
-        ["Top-Down (memoizzato)", f"{opt_war_td:.1f}", "(solo valore)", "-"],
-        ["Bottom-Up + Filtro Pareto", f"{opt_war_filter:.1f}", f"${cost_fil:,.0f}", str(len(roster_fil))],
+        ["Bottom-Up (vettore singolo)", f"{opt_war_vec:.1f}", "-", "-"],
+        ["Top-Down (ricorsivo)", f"{opt_war_td:.1f}", "-", "-"],
+        ["Bottom-Up (con filtro)", f"{opt_war_filter:.1f}", f"${cost_fil:,.0f}", str(len(roster_fil))],
+        ["Bottom-Up (vettore singolo + filtro)", f"{opt_war_filter_vec:.1f}", "-", "-"],
     ]
 
     print(exporter.format_box_table(headers, rows, alignments))
@@ -206,24 +169,24 @@ def run_coherence_comparison(scenario):
     coincidono = (abs(opt_war_s - opt_war_no_s) < 1e-9 and 
                   abs(opt_war_s - opt_war_vec) < 1e-9 and 
                   abs(opt_war_s - opt_war_td) < 1e-9 and 
-                  abs(opt_war_s - opt_war_filter) < 1e-9)
+                  abs(opt_war_s - opt_war_filter) < 1e-9 and
+                  abs(opt_war_s - opt_war_filter_vec) < 1e-9)
 
     print()
     if coincidono:
-        print("Esito: [CONFERMATO] Tutte le 5 varianti calcolano esattamente lo stesso WAR ottimo.")
+        print("SUCCESSO! Tutte le varianti calcolano lo stesso WAR ottimo.")
     else:
-        print("Esito: [AVVISO] Sono state riscontrate discrepanze numeriche.")
+        print("AVVISO! Non tutte le varianti calcolano lo stesso WAR ottimo.")
 
 
 def graphs_menu(scenario):
-    """Sotto-menu per aprire i grafici prestazionali in modo multipiattaforma."""
     results_dir = Path("results")
     while True:
         print_header(scenario)
-        print("GRAFICI PRESTAZIONALI E BENCHMARK (Compito 3):\n")
-        print("1. Apri Grafico Valore Ottimo (Tempo e Memoria)")
-        print("2. Apri Grafico Ricostruzione (Memoria: matrice s vs matrice m)")
-        print("3. Apri Tabella Comparativa Prestazioni (PNG)")
+        print("GRAFICI E BENCHMARK DELLE PRESTAZIONI:\n")
+        print("1. Apri grafico calcolo WAR ottimo")
+        print("2. Apri grafico ricostruzione rosa ottima")
+        print("3. Apri tabella comparativa prestazioni")
         print("0. Torna al menu principale\n")
 
         sub_choice = input("Seleziona un'opzione [0-3]: ").strip()
@@ -257,11 +220,11 @@ def interactive_menu():
         scenario = load_scenario(scenarios[current_idx])
         print_header(scenario)
 
-        print("1. Mostra Rosa Titolare Ottimale")
-        print("2. Ispeziona Matrici Dinamiche (m ed s)")
-        print("3. Confronta Tutte le Varianti Algoritmiche")
-        print("4. Cambia Scenario")
-        print("5. Grafici Prestazionali e Benchmark (Compito 3)")
+        print("1. Mostra rosa ottimale")
+        print("2. Visualizza tabelle")
+        print("3. Confronta le varianti algoritmiche")
+        print("4. Cambia scenario")
+        print("5. Grafici e benchmark delle prestazioni")
         print("0. Esci\n")
 
         choice = input("Seleziona un'opzione [0-5]: ").strip()
@@ -278,7 +241,7 @@ def interactive_menu():
                 players=signed_players,
                 total_cost=total_cost,
             )
-            print_roster_dataframe(scenario, solution)
+            print_roster(scenario, solution)
             pause()
 
         elif choice == "2":
@@ -286,12 +249,12 @@ def interactive_menu():
             N, X, players = scenario.N, scenario.budget, scenario.get_players_matrix()
             _, s = compute_optimal_war(N, X, players, scenario.cost_unit)
             _, m = compute_optimal_war_without_s(N, X, players, scenario.cost_unit)
-            print_matrices_dataframe(scenario, m, s)
+            print_matrices(scenario, m, s)
             pause()
 
         elif choice == "3":
             print_header(scenario)
-            run_coherence_comparison(scenario)
+            run_variants_comparison(scenario)
             pause()
 
         elif choice == "4":
@@ -318,19 +281,21 @@ def interactive_menu():
 
 def main():
     clear_screen()
-    print("PROGETTO ALGORITMI: SIGNING FREE-AGENT PLAYERS")
-    print("Modellazione e Risoluzione tramite Programmazione Dinamica\n")
-    print("Fase 1: Esecuzione del processo di calcolo ed elaborazione degli scenari.")
-    print("        (Vengono eseguiti gli algoritmi, calcolate le metriche ed esportati i file di output)\n")
+    print("\033[1;34mDEMO PROGETTO ALGORITMI E STRUTTURE DATI - Programmazione Dinamica\033[0m\n")
+    print("Problema: \033[1;32mSigning Free-Agent Players\033[0m\n")
 
-    scelta = input("Avviare l'elaborazione su tutti gli scenari? [S/n]: ").strip().lower()
-    if scelta not in ("n", "no"):
-        print()
-        from main import main as run_batch_benchmarks
-        run_batch_benchmarks()
-        print("\nElaborazione completata con successo!")
-        input("\nPremi [Invio] per accedere al menu interattivo della demo...")
-
+    while True:
+        choice = input("Avviare l'elaborazione su tutti gli scenari di test? [s/n]: ").strip().lower()
+        if choice in ("s", "si"):
+            from main import run_all_scenarios
+            print()
+            run_all_scenarios()
+            input("\nPremi [Invio] per accedere al menu...")
+            break
+        elif choice in ("n", "no"):
+            input("\nPremi [Invio] per accedere al menu...")
+            break
+        
     interactive_menu()
 
 

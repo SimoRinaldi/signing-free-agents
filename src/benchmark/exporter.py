@@ -138,7 +138,7 @@ class DataExporter:
             for j, val in enumerate(row):
                 base_str = f"{val:.1f}" if isinstance(val, float) else str(val)
                 if highlight_cell and highlight_cell == (i, j):
-                    base_str = f"\033[1;32m★ {base_str}\033[0m"
+                    base_str = f"\033[1;33m{base_str}\033[0m"
                 formatted_vals.append(base_str)
             rows_data.append([label] + formatted_vals)
 
