@@ -4,7 +4,7 @@
 Per sottoporre a una valutazione empirica rigorosa gli algoritmi risolutivi e le relative varianti, è stato predisposto un insieme di istanze di prova strutturato attorno a dati realistici provenienti dal mondo del baseball professionistico (\textit{MLB}). La scelta di attingere a dati reali risponde all'obiettivo di testare il comportamento delle procedure non solo su distribuzioni sintetiche o puramente teoriche, ma su valori contrattuali e indicatori di rendimento che riflettono fedelmente le dinamiche decisionali del problema originario.
 
 \subsubsection{Composizione del Dataset e Ruoli Difensivi}
-Nel rispetto della formulazione del problema esposta nel Compito~1, ciascuna istanza considera la copertura dei canonici $N = 9$ ruoli difensivi del baseball:
+Nel rispetto della formulazione matematica precedentemente definita, ciascuna istanza considera la copertura dei canonici $N = 9$ ruoli difensivi del baseball:
 \begin{enumerate}
 	\item \textit{Starting Pitcher} (lanciatore partente);
 	\item \textit{Relief Pitcher} (lanciatore di rilievo);
@@ -78,6 +78,35 @@ La struttura di ciascun file JSON è articolata nei seguenti campi:
 All'avvio dell'applicazione, il modulo \texttt{loader.py} esegue il parsing del documento JSON convertendolo negli oggetti immutabili \texttt{Scenario}, \texttt{Role} e \texttt{Player} definiti in \texttt{models.py}, validando preventivamente l'integrità dei parametri prima dell'invocazione degli algoritmi risolutivi.
 
 \subsection{Varianti Algoritmiche Implementate}
+Con l'obiettivo di ottimizzare le prestazioni computazionali ed estendere le dimensioni delle istanze elaborabili senza incorrere in saturazione di memoria, sono state sviluppate e sottoposte a sperimentazione diverse varianti dell'algoritmo di calcolo del valore ottimo, confrontate poi sistematicamente con la formulazione canonica di riferimento.
+
+\subsubsection{Variante Bottom-Up con Sola Matrice \texorpdfstring{$m$}{m} (Senza Tabella \texorpdfstring{$s$}{s})}
+L'algoritmo canonico (Algoritmo~\ref{alg:compute_optimal_war}) compie l'allocazione congiunta di due tabelle bidimensionali: la matrice dei valori $m$ e la matrice delle decisioni $s$. Come prima variante mirata al contenimento dell'occupazione spaziale, la procedura viene privata dell'allocazione e dell'aggiornamento della matrice ausiliaria $s$, calcolando e restituendo esclusivamente la matrice dei valori $m$.
+
+Il codice Python implementato è il seguente:
+
+\begin{lstlisting}
+def compute_optimal_war_without_s(N, X, players, cost_unit=100000):
+    B = floor(X / cost_unit)
+    m = [[0.0 for _ in range(B + 1)] for _ in range(N + 1)]
+
+    for i in range(1, N + 1):
+        m[i][:] = m[i - 1][:]
+
+        for p in players[i - 1]:
+            c = p.cost // cost_unit
+            war_p = p.war
+
+            for b in range(c, B + 1):
+                war = m[i - 1][b - c] + war_p
+                if war > m[i][b]:
+                    m[i][b] = war
+
+    optimal_war = m[N][B]
+    return optimal_war, m
+\end{lstlisting}
+
+Sotto il profilo asintotico, la complessità temporale rimane invariata a $\Theta(N \cdot B \cdot P)$, ma l'occupazione di memoria viene ridotta da $2(N + 1)(B + 1)$ a $(N + 1)(B + 1)$ celle, conseguendo un risparmio secco del $50\%$ dello spazio tabellare.
 
 \subsubsection{Variante Salvaspazio a Vettore Singolo 1D}
 Nell'algoritmo classico, per calcolare il valore ottimo si usa una tabella con $N+1$ righe e $B+1$ colonne, occupando uno spazio in memoria pari a $\Theta(N \cdot B)$. Tuttavia, quando si calcolano i valori per il ruolo $i$, servono solo ed esclusivamente i valori del ruolo precedente $i-1$. Non serve quindi conservare tutta la storia delle righe precedenti: basta usare un unico vettore di dimensione $B+1$.
@@ -88,7 +117,7 @@ Il punto chiave di questa variante è la direzione del ciclo sul budget, che dev
 	\item Scorrendo invece il budget all'indietro (da $B$ a $0$), quando andiamo a leggere la cella $b - c$, quella posizione non è ancora stata toccata per il ruolo $i$ e contiene ancora il valore del ruolo precedente $i-1$. In questo modo siamo sicuri che ogni giocatore venga considerato al massimo una volta per il suo ruolo.
 \end{itemize}
 
-Il codice Python implementato in \texttt{src/algorithms/space\_optimized.py} è il seguente:
+Il codice Python implementato è il seguente:
 
 \begin{lstlisting}
 def compute_optimal_war_with_one_vector(N, X, players, cost_unit=100000):
@@ -117,3 +146,78 @@ def compute_optimal_war_with_one_vector(N, X, players, cost_unit=100000):
 Il tempo di calcolo rimane invariato ($\Theta(N \cdot B \cdot P)$), perché il numero di controlli da fare è lo stesso. Il vantaggio sta nella memoria, che scende da $\Theta(N \cdot B)$ a \textbf{$\Theta(B)$}, diventando del tutto indipendente dal numero di ruoli $N$.
 
 L'unico compromesso di questo approccio è che, sovrascrivendo i valori riga dopo riga nello stesso vettore, alla fine dell'esecuzione si perde la traccia delle scelte fatte e non è possibile ricostruire quali specifici giocatori compongono la rosa ottima.
+
+\subsubsection{Variante Ricorsiva Top-Down con Memoizzazione}
+L'approccio \textit{top-down} implementa la relazione di ricorrenza di Bellman mediante chiamate ricorsive a partire dallo stato obiettivo $(N, B)$ verso i casi base, memorizzando i risultati parziali in una matrice ausiliaria \texttt{memo} di dimensione $(N + 1) \times (B + 1)$, pre-inizializzata con valori sentinella negativi per distinguere gli stati non ancora calcolati.
+
+Il codice Python implementato è il seguente:
+
+\begin{lstlisting}
+def compute_optimal_war_with_recursion(N, X, players, cost_unit=100000):
+    B = floor(X / cost_unit)
+    memo = [[float(-b - 1) for b in range(B + 1)] for _ in range(N + 1)]
+
+    def dp(i, b):
+        if i == 0:
+            return 0.0
+
+        if memo[i][b] >= 0:
+            return memo[i][b]
+
+        best_war = dp(i - 1, b)
+
+        for p in players[i - 1]:
+            c = p.cost // cost_unit
+            if c <= b:
+                candidate_war = dp(i - 1, b - c) + p.war
+                if candidate_war > best_war:
+                    best_war = candidate_war
+
+        memo[i][b] = best_war
+        return best_war
+
+    optimal_war = dp(N, B)
+    return optimal_war
+\end{lstlisting}
+
+Sotto il profilo teorico, il caso peggiore richiede la valutazione dell'intera tabella, mantenendo una complessità temporale $O(N \cdot B \cdot P)$ e spaziale $\Theta(N \cdot B)$ (a cui si sommano gli $O(N)$ record di attivazione generati sulla pila di chiamate ricorsive). Tuttavia, in scenari pratici in cui i costi dei giocatori presentano combinazioni discrete e intervallate, molti stati $(i, b)$ intermedi non risultano mai raggiungibili partendo da $(N, B)$. La variante top-down calcola esclusivamente gli stati strettamente necessari alla soluzione, consentendo in contesti sparsi un marcato abbattimento dei tempi effettivi di calcolo.
+
+\subsubsection{Ottimizzazione mediante Filtro di Pareto (Potatura dei Candidati Dominati)}
+Un'ulteriore ottimizzazione consiste nella riduzione a priori del bacino dei candidati disponibili per ciascun ruolo tramite l'estrazione della \textit{frontiera di Pareto}.
+Nel problema in esame, per ciascun ruolo si seleziona al più un singolo atleta. Considerati due candidati $p_1, p_2$ appartenenti al medesimo ruolo $i$, diciamo che $p_1$ \textbf{domina} $p_2$ se:
+\begin{equation}
+	c_{i, p_1} \le c_{i, p_2} \quad \wedge \quad v_{i, p_1} \ge v_{i, p_2}
+\end{equation}
+con almeno una disuguaglianza stretta. Un candidato dominato richiede una spesa maggiore (o uguale) per offrire un rendimento inferiore (o uguale); esso non potrà pertanto mai far parte di alcuna configurazione ottima e può essere scartato senza alterare l'ottimalità della soluzione finale.
+
+L'algoritmo di pre-filtraggio opera in due fasi:
+\begin{enumerate}
+	\item Per ogni ruolo, elimina gli atleti con $v \le 0$ o con costo eccedente il budget totale $B$, e ordina i restanti candidati per costo crescente (e WAR decrescente in caso di pareggio) in tempo $O(P \log P)$.
+	\item Esegue una scansione lineare in tempo $O(P)$ mantenendo il massimo WAR osservato fino a quel punto, conservando solo i candidati che presentano un WAR strettamente superiore al massimo corrente.
+\end{enumerate}
+
+\begin{lstlisting}
+def filter_players(players, cost_unit=100000, total_budget=None):
+    valid_players = []
+    for players_list in players:
+        role_valid = []
+        for p in players_list:
+            c = p.cost // cost_unit
+            if p.war > 0.0 and (total_budget is None or c <= total_budget):
+                role_valid.append(p)
+        role_valid.sort(key=lambda p: (p.cost, -p.war))
+        valid_players.append(role_valid)
+
+    filtered_players = []
+    for role_candidates in valid_players:
+        role_valid = []
+        max_war = 0.0
+        for p in role_candidates:
+            if p.war > max_war:
+                role_valid.append(p)
+                max_war = p.war
+        filtered_players.append(role_valid)
+    return filtered_players
+\end{lstlisting}
+
+Il costo computazionale preliminare è $O(N \cdot P \log P)$, trascurabile rispetto all'esecuzione della programmazione dinamica. L'effetto è quello di ridurre il numero effettivo di candidati da $P$ a un sottoinsieme $P' \ll P$, velocizzando proporzionalmente il ciclo interno di tutte le varianti bottom-up che non necessitano della corrispondenza biunivoca degli indici nella matrice $s$.
