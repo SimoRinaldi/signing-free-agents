@@ -92,39 +92,53 @@ def print_roster(scenario, solution: RosterSolution):
 
     percentuale_spesa = (solution.total_cost / scenario.budget) * 100 if scenario.budget > 0 else 0
     print(f"\nRiepilogo:")
-    print(f"  • WAR ottimo:               ${solution.optimal_war:.1f}")
+    print(f"  • WAR ottimo:               {solution.optimal_war:.1f}")
     print(f"  • Budget iniziale:          ${scenario.budget:,.0f}")
     print(f"  • Spesa effettiva:          ${solution.total_cost:,.0f} ({percentuale_spesa:.1f}% del budget)")
     print(f"  • Budget residuo:           ${scenario.budget - solution.total_cost:,.0f}")
 
 
 def print_matrices(scenario, m, s):
-    max_cols = 10
-    limit_cols = min(scenario.B + 1, max_cols)
-    col_labels = [f"b={b}" for b in range(limit_cols)]
-
     role_labels_m = [""] + [
         f"{r.name}" for _, r in enumerate(scenario.roles, 1)
     ] 
 
     role_labels_s = [""] + [
-        f"{r.name} ({idx})" for idx, r in enumerate(scenario.roles, 1)
+        f"{r.name}" for _, r in enumerate(scenario.roles, 1)
     ] 
 
-    if scenario.B >= max_cols:
-        print(f"[Nota: Budget B={scenario.B} elevato; visualizzazione limitata alle prime {limit_cols} colonne]\n")
+    max_cols = 8
+    if scenario.B + 1 <= max_cols:
+        col_labels = [f"b={b}" for b in range(scenario.B + 1)]
+        m_sub = m
+        s_sub = s
+        highlight_m = (scenario.N, scenario.B)
+    else:
+        head_indices = list(range(4))
+        tail_indices = list(range(scenario.B - 3, scenario.B + 1))
 
-    m_sub = [row[:limit_cols] for row in m]
-    s_sub = [row[:limit_cols] for row in s]
+        col_labels = [f"b={b}" for b in head_indices] + ["..."] + [f"b={b}" for b in tail_indices]
 
-    highlight_m = (scenario.N, scenario.B) if scenario.B < max_cols else None
+        m_sub = [
+            [row[b] for b in head_indices] + ["..."] + [row[b] for b in tail_indices]
+            for row in m
+        ]
 
-    print("Matrice m:")
+        s_sub = [
+            [row[b] for b in head_indices] + ["..."] + [row[b] for b in tail_indices]
+            for row in s
+        ]
+
+        highlight_m = (scenario.N, len(m_sub[0]) - 1)
+
+        print(f"[Nota: Budget B={scenario.B} elevato, visualizzazione limitata alle prime 4 e ultime 4 colonne]\n")
+
+    print("Tabella m (per il calcolo del WAR ottimo):")
     print(exporter.format_matrix(m_sub, row_labels=role_labels_m, col_labels=col_labels, highlight_cell=highlight_m))
 
-    print("\nMatrice s (-1 = nessun acquisto):")
+    print("\nTabella s (per la ricostruzione della rosa ottima):")
     print(exporter.format_matrix(s_sub, row_labels=role_labels_s, col_labels=col_labels, highlight_cell=None))
-
+    print("(-1 = nessun acquisto), (>=0 = indice del giocatore selezionato per il ruolo corrispondente)")
 
 def run_variants_comparison(scenario):
     print("CONFRONTO TRA VARIANTI ALGORITMICHE:\n")
