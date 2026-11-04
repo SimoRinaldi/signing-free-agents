@@ -1,6 +1,6 @@
 {
-  "scenario_name": "scenario_15_N9_B5500_P30",
-  "budget": 550000000,
+  "scenario_name": "scenario_04_N9_B5000_P30",
+  "budget": 500000000,
   "cost_unit": 100000,
   "roles": [
     {

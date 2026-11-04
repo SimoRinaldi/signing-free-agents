@@ -25,9 +25,9 @@ Ciascun atleta $k \in \{1, \dots, P\}$ all'interno del ruolo $i \in \{1, \dots, 
 dove $\mathit{cost}_{i, k} \in \mathbb{N}^+$ rappresenta il compenso contrattuale lordo (con valori compresi tra poche centinaia di migliaia di dollari fino a decine di milioni di dollari), mentre $v_{i, k} = \text{WAR} \ge 0$ rappresenta il contributo marginale del giocatore alle vittorie stagionali attese della squadra rispetto al livello di rimpiazzo.
 
 \subsubsection{Generazione e Parametrizzazione degli Scenari}
-Per analizzare sistematicamente la crescita del tempo di esecuzione e del consumo di memoria primaria, sono stati generati 10 scenari incrementali di test, denominati da \texttt{scenario\_11\_N9\_B3500\_P30} a \texttt{scenario\_20\_N9\_B8000\_P30}.
+Per analizzare sistematicamente la crescita del tempo di esecuzione e del consumo di memoria primaria, sono stati generati 10 scenari incrementali di test, denominati da \texttt{scenario\_01} a \texttt{scenario\_10} (con suffisso \texttt{\_N9\_BXXXX\_P30}). A questi si aggiunge un'istanza minimale di verifica denominata \texttt{scenario\_00\_N3\_B6\_P3} ($N=3$, $B=6$, $P=3$), concepita specificamente per consentire una dimostrazione interattiva e un'ispezione immediata delle matrici prodotte.
 
-Nella progettazione della campagna sperimentale si è scelto di mantenere fisso il numero di atleti disponibili (confermati a $N = 9$ e $P = 30$ per tutte le istanze) e di far variare esclusivamente il budget nominale $X$. Il budget parte da un valore base di $\$350\,000\,000$ nello scenario 11 e cresce con incremento lineare e uniforme di $\$50\,000\,000$ per ciascuno scenario successivo, attestandosi infine a $\$800\,000\,000$ nello scenario 20.
+Nella progettazione della campagna sperimentale principale si è scelto di mantenere fisso il numero di atleti disponibili (confermati a $N = 9$ e $P = 30$ per tutte le istanze) e di far variare esclusivamente il budget nominale $X$. Il budget parte da un valore base di $\$350\,000\,000$ nello scenario 01 e cresce con incremento lineare e uniforme di $\$50\,000\,000$ per ciascuno scenario successivo, attestandosi infine a $\$800\,000\,000$ nello scenario 10.
 
 Di conseguenza, il budget discreto associato varia progressivamente nell'intervallo:
 \begin{equation}
@@ -50,16 +50,16 @@ In Tabella~\ref{tab:scenarios_overview} vengono dettagliati i parametri operativ
 		\toprule
 		\textbf{Identificativo Scenario} & $N$ & $P$ & \textbf{Budget Nominale ($X$)} & $B$ & \textbf{Dimensione ($N \cdot B \cdot P$)} \\
 		\midrule
-		\texttt{scenario\_11\_N9\_B3500\_P30} & 9 & 30 & $\$350\,000\,000$ & 3500 & $945\,000$ \\
-		\texttt{scenario\_12\_N9\_B4000\_P30} & 9 & 30 & $\$400\,000\,000$ & 4000 & $1\,080\,000$ \\
-		\texttt{scenario\_13\_N9\_B4500\_P30} & 9 & 30 & $\$450\,000\,000$ & 4500 & $1\,215\,000$ \\
-		\texttt{scenario\_14\_N9\_B5000\_P30} & 9 & 30 & $\$500\,000\,000$ & 5000 & $1\,350\,000$ \\
-		\texttt{scenario\_15\_N9\_B5500\_P30} & 9 & 30 & $\$550\,000\,000$ & 5500 & $1\,485\,000$ \\
-		\texttt{scenario\_16\_N9\_B6000\_P30} & 9 & 30 & $\$600\,000\,000$ & 6000 & $1\,620\,000$ \\
-		\texttt{scenario\_17\_N9\_B6500\_P30} & 9 & 30 & $\$650\,000\,000$ & 6500 & $1\,755\,000$ \\
-		\texttt{scenario\_18\_N9\_B7000\_P30} & 9 & 30 & $\$700\,000\,000$ & 7000 & $1\,890\,000$ \\
-		\texttt{scenario\_19\_N9\_B7500\_P30} & 9 & 30 & $\$750\,000\,000$ & 7500 & $2\,025\,000$ \\
-		\texttt{scenario\_20\_N9\_B8000\_P30} & 9 & 30 & $\$800\,000\,000$ & 8000 & $2\,160\,000$ \\
+		\texttt{scenario\_01\_N9\_B3500\_P30} & 9 & 30 & $\$350\,000\,000$ & 3500 & $945\,000$ \\
+		\texttt{scenario\_02\_N9\_B4000\_P30} & 9 & 30 & $\$400\,000\,000$ & 4000 & $1\,080\,000$ \\
+		\texttt{scenario\_03\_N9\_B4500\_P30} & 9 & 30 & $\$450\,000\,000$ & 4500 & $1\,215\,000$ \\
+		\texttt{scenario\_04\_N9\_B5000\_P30} & 9 & 30 & $\$500\,000\,000$ & 5000 & $1\,350\,000$ \\
+		\texttt{scenario\_05\_N9\_B5500\_P30} & 9 & 30 & $\$550\,000\,000$ & 5500 & $1\,485\,000$ \\
+		\texttt{scenario\_06\_N9\_B6000\_P30} & 9 & 30 & $\$600\,000\,000$ & 6000 & $1\,620\,000$ \\
+		\texttt{scenario\_07\_N9\_B6500\_P30} & 9 & 30 & $\$650\,000\,000$ & 6500 & $1\,755\,000$ \\
+		\texttt{scenario\_08\_N9\_B7000\_P30} & 9 & 30 & $\$700\,000\,000$ & 7000 & $1\,890\,000$ \\
+		\texttt{scenario\_09\_N9\_B7500\_P30} & 9 & 30 & $\$750\,000\,000$ & 7500 & $2\,025\,000$ \\
+		\texttt{scenario\_10\_N9\_B8000\_P30} & 9 & 30 & $\$800\,000\,000$ & 8000 & $2\,160\,000$ \\
 		\bottomrule
 	\end{tabular}
 \end{table}
@@ -221,3 +221,118 @@ def filter_players(players, cost_unit=100000, total_budget=None):
 \end{lstlisting}
 
 Il costo computazionale preliminare è $O(N \cdot P \log P)$, trascurabile rispetto all'esecuzione della programmazione dinamica. L'effetto è quello di ridurre il numero effettivo di candidati da $P$ a un sottoinsieme $P' \ll P$, velocizzando proporzionalmente il ciclo interno di tutte le varianti bottom-up che non necessitano della corrispondenza biunivoca degli indici nella matrice $s$.
+
+\subsection{Confronto delle Prestazioni e Risultati Empirici}
+La sperimentazione è stata condotta eseguendo le sei varianti algoritmiche sui 10 scenari a budget crescente ($B \in [3500, 8000]$), misurando per ciascuna configurazione il tempo minimo di calcolo su $K = 15$ iterazioni e il picco di memoria heap tracciato.
+
+\subsubsection{Tempi di Calcolo}
+I tempi di calcolo misurati per ciascun algoritmo sui 10 scenari sono riassunti nella Tabella~\ref{tab:execution_times} e visualizzati graficamente nella Figura~\ref{fig:optimal_value_plots}(a).
+
+\begin{table}[!htbp]
+	\centering
+	\footnotesize
+	\setlength{\tabcolsep}{4.5pt}
+	\caption{Tempi di esecuzione (in millisecondi, ms) degli algoritmi sui 10 scenari di test.}
+	\label{tab:execution_times}
+	\begin{tabular}{lccccccc}
+		\toprule
+		\textbf{Scenario} & $B$ & \textbf{BU (con $s$)} & \textbf{BU (senza $s$)} & \textbf{BU (vett.)} & \textbf{Top-Down} & \textbf{BU (filtr.)} & \textbf{BU (vett.+filtr.)} \\
+		\midrule
+		\texttt{sc\_01} & 3500 & 62.01 & 61.23 & 64.95 & 3.91 & 20.77 & 21.20 \\
+		\texttt{sc\_02} & 4000 & 71.48 & 69.93 & 74.02 & 4.26 & 23.71 & 23.94 \\
+		\texttt{sc\_03} & 4500 & 80.18 & 78.86 & 83.55 & 4.75 & 26.87 & 27.09 \\
+		\texttt{sc\_04} & 5000 & 90.98 & 88.48 & 95.37 & 5.09 & 30.49 & 30.47 \\
+		\texttt{sc\_05} & 5500 & 99.59 & 97.26 & 102.58 & 5.33 & 33.09 & 33.34 \\
+		\texttt{sc\_06} & 6000 & 107.99 & 108.98 & 111.81 & 5.48 & 36.08 & 36.23 \\
+		\texttt{sc\_07} & 6500 & 116.92 & 114.38 & 120.99 & 6.73 & 39.14 & 39.42 \\
+		\texttt{sc\_08} & 7000 & 125.16 & 123.53 & 131.12 & 6.15 & 42.12 & 44.06 \\
+		\texttt{sc\_09} & 7500 & 134.38 & 140.82 & 141.60 & 6.58 & 45.23 & 45.24 \\
+		\texttt{sc\_10} & 8000 & 143.98 & 144.30 & 149.65 & 6.94 & 48.35 & 48.50 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=\textwidth]{plot_optimal_value.png}
+	\caption{Confronto delle prestazioni degli algoritmi: (a) tempo di calcolo rispetto alla dimensione dell'istanza ($N \cdot B \cdot P$); (b) picco di memoria rispetto alla dimensione della tabella ($N \cdot B$).}
+	\label{fig:optimal_value_plots}
+\end{figure}
+
+All'aumentare del budget discreto $B$, i tempi di esecuzione del Bottom-Up canonico e delle sue varianti principali mostrano una crescita chiaramente lineare. Poiché il numero di ruoli $N = 9$ e il numero di candidati $P = 30$ sono mantenuti costanti in tutti gli scenari, la dimensione complessiva dell'istanza scala in modo direttamente proporzionale a $B$. Ad esempio, passando dallo scenario 01 ($B = 3500$) allo scenario 10 ($B = 8000$), il budget aumenta di circa $2.29$ volte e il tempo del Bottom-Up su matrice passa da $61.23\text{ ms}$ a $144.30\text{ ms}$ (un incremento di $2.36$ volte), confermando con precisione la complessità teorica $\Theta(N \cdot B \cdot P)$.
+
+Un aspetto centrale riguarda il confronto tra il Bottom-Up su matrice e la variante salvaspazio a vettore singolo 1D. Sebbene quest'ultima operi su una sola riga anziché sull'intera tabella, il numero totale di controlli e di aggiornamenti interni rimane esattamente lo stesso. Per verificare sperimentalmente questa equivalenza è stata calcolata la discrepanza percentuale:
+\begin{equation}
+	\Delta_{\text{time}}\% = \frac{T_{\text{vettore}} - T_{\text{matrice}}}{T_{\text{matrice}}} \times 100
+\end{equation}
+Su tutti i 10 scenari analizzati, la differenza media tra i tempi delle due versioni è di appena il $+4.99\%$ (variando tra un minimo dello $0.55\%$ nello scenario 09 e un massimo del $7.79\%$ nello scenario 04). Applicando il pre-filtraggio di Pareto a entrambi gli algoritmi, la differenza media scende ulteriormente all'$1.06\%$. Questo scarto minimo, nell'ordine di pochi millisecondi, è dovuto unicamente al leggero costo del controllo condizionale nel ciclo decrescente del vettore rispetto alla copia di riga nativa tramite slicing (\texttt{m[i][:] = m[i-1][:]}) di Python. I dati confermano quindi che la variante a vettore singolo non altera la complessità temporale.
+
+L'applicazione del filtro di Pareto permette invece di ridurre notevolmente i tempi di calcolo. Eliminando a priori i candidati dominati all'interno di ciascun ruolo, il numero effettivo di giocatori da valutare scende in media da $P = 30$ a circa $P' \approx 10$. Di conseguenza, il tempo di esecuzione si riduce di circa il $66\%$ su tutti gli scenari, passando da $61.23\text{ ms}$ a $20.77\text{ ms}$ nello scenario 01 e da $144.30\text{ ms}$ a $48.35\text{ ms}$ nello scenario 10.
+
+L'algoritmo Top-Down ricorsivo con memoizzazione risulta il più rapido nei test, con tempi compresi tra $3.91\text{ ms}$ e $6.94\text{ ms}$. Questo comportamento è dovuto alla natura discreta dei costi dei contratti: scendendo a ritroso a partire dallo stato finale $(N, B)$, gran parte delle celle $(i, b)$ della matrice non viene mai raggiunta da combinazioni valide di acquisti. L'approccio ricorsivo valuta solo gli stati strettamente necessari per risolvere il problema, evitando di calcolare l'intera griglia come fa invece il Bottom-Up.
+
+\subsubsection{Occupazione di Memoria}
+I valori di picco di memoria heap campionati tramite \texttt{tracemalloc} sono riportati nella Tabella~\ref{tab:memory_consumption} e mostrati graficamente nella Figura~\ref{fig:optimal_value_plots}(b).
+
+\begin{table}[!htbp]
+	\centering
+	\small
+	\caption{Picco di memoria heap allocata (in KiB) per gli algoritmi di calcolo del valore ottimo.}
+	\label{tab:memory_consumption}
+	\begin{tabular}{lccccc}
+		\toprule
+		\textbf{Scenario} & $B$ & \textbf{BU (con $s$)} & \textbf{BU (senza $s$)} & \textbf{BU (vettore 1D)} & \textbf{Top-Down} \\
+		\midrule
+		\texttt{sc\_01} & 3500 & 1306.0 & 1019.9 & 108.4 & 1107.2 \\
+		\texttt{sc\_02} & 4000 & 1484.0 & 1161.6 & 123.7 & 1260.6 \\
+		\texttt{sc\_03} & 4500 & 1670.7 & 1307.7 & 139.5 & 1418.5 \\
+		\texttt{sc\_04} & 5000 & 1867.4 & 1458.8 & 155.8 & 1581.3 \\
+		\texttt{sc\_05} & 5500 & 2076.0 & 1615.8 & 172.6 & 1750.0 \\
+		\texttt{sc\_06} & 6000 & 2297.1 & 1779.1 & 190.1 & 1925.0 \\
+		\texttt{sc\_07} & 6500 & 2402.6 & 1884.6 & 201.9 & 2042.2 \\
+		\texttt{sc\_08} & 7000 & 2638.1 & 2055.0 & 220.1 & 2224.4 \\
+		\texttt{sc\_09} & 7500 & 2889.8 & 2233.6 & 239.1 & 2414.7 \\
+		\texttt{sc\_10} & 8000 & 2995.2 & 2339.1 & 250.8 & 2531.9 \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+Il risultato più evidente è il forte calo di memoria ottenuto con la variante a vettore singolo 1D. Ci si potrebbe chiedere come mai, pur mantenendo in memoria un intero vettore di dimensione $B+1$ (oltre 8000 elementi nello scenario 10), l'uso della memoria scenda di quasi il $90\%$. La ragione sta nel fatto che la matrice dinamica classica alloca $N+1$ liste distinte: nel nostro caso, con $N = 9$ ruoli difensivi, vengono create 10 liste indipendenti, per un totale di $10 \cdot (B + 1)$ elementi. Il vettore singolo, invece, alloca una sola lista di dimensione $B + 1$. Il rapporto dimensionale teorico è quindi:
+\begin{equation}
+	\frac{1 \cdot (B + 1)}{(N + 1) \cdot (B + 1)} = \frac{1}{N + 1} = \frac{1}{10} = 10\%
+\end{equation}
+L'occupazione di memoria attesa scende al $10\%$ del totale, corrispondendo esattamente a una riduzione del $90\%$. Le misure empiriche confermano in pieno questo andamento, registrando un risparmio medio costante dell'$89.32\%$ rispetto alla matrice $m$ (e di oltre il $91.6\%$ rispetto alla versione con entrambe le matrici $m$ ed $s$). L'ottimizzazione a vettore singolo funziona quindi perché elimina del tutto il moltiplicatore legato al numero di ruoli $N$, portando la complessità spaziale da $\Theta(N \cdot B)$ a $\Theta(B)$.
+
+Per quanto riguarda il Top-Down, la memoria occupata ($1107.2\text{ KiB}$ nello scenario 01 e $2531.9\text{ KiB}$ nello scenario 10) è molto vicina a quella del Bottom-Up senza matrice $s$. Per comprendere questo dato è utile distinguere tra la memoria allocata sull'heap e quella utilizzata sullo stack delle chiamate:
+\begin{itemize}
+	\item \textbf{Memoria heap:} per memorizzare i risultati dei sottoproblemi, l'algoritmo crea all'avvio l'intera tabella \texttt{memo} di $(N+1) \times (B+1)$ elementi con valori sentinella negativi. Poiché \texttt{tracemalloc} misura il picco di memoria fisica allocata sull'heap, l'ingombro risulta pari a quello di una matrice completa $\Theta(N \cdot B)$, anche se molte celle non vengono mai calcolate durante l'esplorazione.
+	\item \textbf{Stack di ricorsione:} ogni chiamata di funzione aggiunge un record di attivazione sullo stack di Python. Tuttavia, poiché a ogni passo si passa al ruolo precedente ($i \to i-1$), la profondità massima della ricorsione è limitata a $N = 9$ chiamate annidate. Lo spazio occupato dallo stack è quindi limitato a $O(N)$ record di attivazione, una quantità del tutto trascurabile rispetto alle migliaia di elementi presenti nella tabella sull'heap.
+\end{itemize}
+
+\subsubsection{Ricostruzione della Rosa e Verifica delle Uscite}
+Per verificare la correttezza dei risultati e documentare il calcolo effettivo delle uscite, è stata analizzata la rosa ottima prodotta dai metodi di ricostruzione. Su tutti i 10 scenari analizzati, la ricostruzione basata sulla matrice decisionale $s$ e quella eseguita direttamente sulla matrice dei valori $m$ identificano esattamente la stessa combinazione di giocatori, confermando la piena correttezza della risalita senza matrice ausiliaria e attestando il valore ottimo sempre a $63.0$ WAR con la copertura di tutti i 9 ruoli previsti.
+
+\begin{figure}[!htbp]
+	\centering
+	\includegraphics[width=0.72\textwidth]{plot_reconstruction_memory.png}
+	\caption{Confronto dell'occupazione di memoria heap tra la strategia con matrice delle decisioni $s$ (risalita $\Theta(N)$) e la strategia con sola matrice $m$ (risalita $O(N \cdot P)$).}
+	\label{fig:reconstruction_memory_plot}
+\end{figure}
+
+Come illustrato nella Figura~\ref{fig:reconstruction_memory_plot}, la scelta del metodo di ricostruzione comporta un chiaro compromesso tra tempo di risalita e memoria occupata durante la fase tabellare:
+\begin{itemize}
+	\item \textbf{Ricostruzione con matrice $s$:} consente di estrarre la formazione titolare in tempo $\Theta(N)$, ma richiede di mantenere in memoria entrambe le matrici $m$ ed $s$ durante tutto il calcolo dinamico, raggiungendo un picco di quasi $3.0\text{ MB}$ nello scenario 10.
+	\item \textbf{Ricostruzione senza matrice $s$:} ricostruisce la soluzione a ritroso controllando direttamente la matrice $m$ in tempo $O(N \cdot P)$. Poiché $N = 9$ e $P = 30$, l'operazione compie al massimo 270 controlli elementari (eseguiti in frazioni trascurabili di millisecondo), permettendo di risparmiare oltre $650\text{ KiB}$ di memoria RAM durante il calcolo dinamico.
+\end{itemize}
+La variante a vettore singolo 1D, infine, pur offrendo la massima efficienza in termini di memoria ($\Theta(B)$), non conserva le informazioni necessarie per risalire alle decisioni prese, rendendo impossibile ricostruire la composizione della rosa e limitandosi al calcolo del solo valore massimo di WAR.
+
+\subsection{Limitazioni Riscontrate}
+Dall'analisi teorica e dalle prove sperimentali emergono alcune limitazioni pratiche del modello e degli algoritmi implementati.
+
+In primo luogo, la complessità degli algoritmi è pseudo-polinomiale e dipende dal valore del budget discretizzato $B = \lfloor X / \text{COST\_UNIT} \rfloor$. Con la costante di discretizzazione $\text{COST\_UNIT} = 100\,000$, il valore di $B$ rimane contenuto nell'ordine delle migliaia, consentendo tempi di esecuzione dell'ordine dei decimi di secondo. Se tuttavia si adottasse una granularità molto più fine (ad esempio al singolo dollaro per gestire compensi precisi al centesimo), $B$ crescerebbe di cinque ordini di grandezza, rendendo la griglia dinamica intrattabile sia per il tempo di calcolo sia per la memoria necessaria.
+
+In secondo luogo, la variante salvaspazio a vettore singolo comporta la perdita della traccia delle scelte ottime: sovrascrivendo l'unico vettore riga dopo riga, alla fine del calcolo non è più possibile risalire a quali giocatori siano stati ingaggiati. Questa variante è quindi utile solo nei casi in cui interessi conoscere unicamente il rendimento massimo raggiungibile con un dato budget.
+
+Per quanto riguarda il filtro di Pareto, la sua efficacia dipende dalla distribuzione reale dei costi e dei rendimenti degli atleti. Nel nostro dataset molti giocatori risultano dominati, permettendo di ridurre $P$ da 30 a circa 10 candidati per ruolo. In uno scenario in cui tutti i giocatori offrissero un WAR strettamente crescente al crescere del prezzo (nessun giocatore dominato), il filtro non eliminerebbe alcun candidato e introdurrebbe solo il costo dell'ordinamento iniziale $O(N \cdot P \log P)$.
+
+Infine, l'approccio Top-Down ricorsivo, pur essendo molto veloce su questo tipo di dati grazie alla sparsità degli stati raggiungibili, risente del limite massimo di ricorsione imposto dall'interprete Python (\texttt{sys.getrecursionlimit()}). Sebbene con $N = 9$ ruoli la ricorsione sia profonda solo 9 livelli, un problema analogo con centinaia o migliaia di categorie porterebbe a un errore di stack overflow, rendendo necessaria una formulazione iterativa.
