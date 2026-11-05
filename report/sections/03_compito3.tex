@@ -1,7 +1,7 @@
 \section{Valutazione Sperimentale e Varianti degli Algoritmi}
 
 \subsection{Caratteristiche delle Istanze di Test}
-Per valutare gli algoritmi risolutivi e le loro varianti, abbiamo preparato un insieme di istanze di test basate su dati reali della Major League Baseball (\textit{MLB}). L'uso di dati reali permette di verificare il comportamento delle soluzioni non solo su distribuzioni teoriche, ma su valori contrattuali e indicatori di rendimento che rispecchiano fedelmente le dinamiche del problema originario.
+Per valutare gli algoritmi risolutivi e le relative varianti, è stato predisposto un insieme di istanze di test basate su dati reali della Major League Baseball (\textit{MLB}). L'uso di dati reali permette di verificare il comportamento delle soluzioni non solo su distribuzioni teoriche, ma su valori contrattuali e indicatori di rendimento che rispecchiano fedelmente le dinamiche del problema originario.
 
 \subsubsection{Composizione del Dataset}
 In linea con il modello matematico, ciascuna istanza prevede la copertura dei canonici $N = 9$ ruoli difensivi del baseball:
@@ -25,9 +25,9 @@ Ciascun atleta $k \in \{1, \dots, P\}$ all'interno del ruolo $i \in \{1, \dots, 
 dove $\mathit{cost}_{i, k} \in \mathbb{N}^+$ rappresenta l'ingaggio contrattuale, mentre $v_{i, k} = \text{WAR} \ge 0$ rappresenta la metrica WAR (\textit{Wins Above Replacement}), che stima quante vittorie in più il giocatore apporta alla squadra rispetto a un sostituto medio.
 
 \subsubsection{Generazione degli Scenari di Test}
-Per analizzare la crescita del tempo di esecuzione e del consumo di memoria, abbiamo generato 10 scenari di test incrementali, denominati da \texttt{scenario\_01} a \texttt{scenario\_10} (con suffisso \texttt{\_N9\_BXXXX\_P30}). A questi si aggiunge un'istanza minima di verifica denominata \texttt{scenario\_00\_N3\_B6\_P3} ($N=3$, $B=6$, $P=3$), pensata per test rapidi e per ispezionare facilmente le matrici prodotte.
+Per analizzare la crescita del tempo di esecuzione e del consumo di memoria, sono stati generati 10 scenari di test incrementali, denominati da \texttt{scenario\_01} a \texttt{scenario\_10} (con suffisso \texttt{\_N9\_BXXXX\_P30}). A questi si aggiunge un'istanza minima di verifica denominata \texttt{scenario\_00\_N3\_B6\_P3} ($N=3$, $B=6$, $P=3$), pensata per test rapidi e per ispezionare facilmente le matrici prodotte.
 
-Nei test abbiamo mantenuto fisso il numero di atleti e fatto variare soltanto il budget nominale $X$. Il budget parte da un valore base di $\$350\,000\,000$ nello scenario 01 e cresce di $\$50\,000\,000$ a ogni scenario successivo, fino a raggiungere $\$800\,000\,000$ nello scenario 10.
+Nei test è stato mantenuto fisso il numero di atleti, facendo variare soltanto il budget nominale $X$. Il budget parte da un valore base di $\$350\,000\,000$ nello scenario 01 e cresce di $\$50\,000\,000$ a ogni scenario successivo, fino a raggiungere $\$800\,000\,000$ nello scenario 10.
 
 Di conseguenza, il budget discreto associato varia progressivamente nell'intervallo:
 \begin{equation}
@@ -74,10 +74,10 @@ La struttura di ciascun file JSON è articolata nei seguenti campi:
 All'avvio, il modulo \texttt{loader.py} legge il file JSON, crea gli oggetti immutabili \texttt{Scenario}, \texttt{Role} e \texttt{Player} (definiti in \texttt{models.py}) e controlla la validità dei dati prima di avviare gli algoritmi risolutivi.
 
 \subsection{Varianti Algoritmiche Implementate}
-Per migliorare le prestazioni e ridurre l'uso di memoria (consentendo così di gestire istanze più grandi), abbiamo sviluppato diverse varianti dell'algoritmo base per il calcolo del valore ottimo, confrontandole poi con la formulazione di riferimento.
+Per migliorare le prestazioni e ridurre l'uso di memoria (consentendo così di gestire istanze più grandi), sono state sviluppate diverse varianti dell'algoritmo base per il calcolo del valore ottimo, confrontate poi con la formulazione di riferimento.
 
 \subsubsection{Variante Bottom-Up senza Matrice \texorpdfstring{$s$}{s}}
-L'algoritmo base (Algoritmo~\ref{alg:compute_optimal_war}) alloca due tabelle bidimensionali: la matrice dei valori $m$ e la matrice delle decisioni $s$. Come prima variante mirata a risparmiare spazio, eliminiamo la matrice ausiliaria $s$, calcolando e restituendo soltanto la matrice dei valori $m$.
+L'algoritmo base (Algoritmo~\ref{alg:compute_optimal_war}) alloca due tabelle bidimensionali: la matrice dei valori $m$ e la matrice delle decisioni $s$. Come prima variante mirata a risparmiare spazio, viene eliminata la matrice ausiliaria $s$, calcolando e restituendo soltanto la matrice dei valori $m$.
 
 Il codice Python implementato è il seguente:
 
@@ -109,8 +109,8 @@ Nell'algoritmo classico, per calcolare il valore ottimo si usa una tabella con $
 
 Il punto chiave di questa variante è la direzione del ciclo sul budget, che deve andare obbligatoriamente \textbf{all'indietro, da $B$ verso $0$}:
 \begin{itemize}
-	\item Se scorressimo il budget in avanti (da $0$ a $B$), quando aggiorniamo una cella con budget $b$ usando il valore alla posizione $b - c$, rischieremmo di leggere un valore già modificato per lo stesso ruolo $i$. Questo permetterebbe all'algoritmo di scegliere più giocatori per lo stesso ruolo (o lo stesso giocatore più volte), violando la regola che impone al massimo un acquisto per ruolo.
-	\item Scorrendo invece il budget all'indietro (da $B$ a $0$), quando leggiamo la cella $b - c$, quella posizione non è ancora stata modificata per il ruolo $i$ e contiene ancora il valore del ruolo precedente $i-1$. In questo modo siamo certi che ogni giocatore venga considerato al massimo una volta per il suo ruolo.
+	\item Scorrendo il budget in avanti (da $0$ a $B$), quando si aggiorna una cella con budget $b$ usando il valore alla posizione $b - c$, si rischia di leggere un valore già modificato per lo stesso ruolo $i$. Questo permetterebbe all'algoritmo di scegliere più giocatori per lo stesso ruolo (o lo stesso giocatore più volte), violando la regola che impone al massimo un acquisto per ruolo.
+	\item Scorrendo invece il budget all'indietro (da $B$ a $0$), quando si legge la cella $b - c$, quella posizione non è ancora stata modificata per il ruolo $i$ e contiene ancora il valore del ruolo precedente $i-1$. In questo modo si garantisce che ogni giocatore venga considerato al massimo una volta per il suo ruolo.
 \end{itemize}
 
 Il codice Python implementato è il seguente:
@@ -176,11 +176,11 @@ def compute_optimal_war_with_recursion(N, X, players, cost_unit=100000):
     return optimal_war
 \end{lstlisting}
 
-Secondo la teoria, nel caso peggiore l'algoritmo deve calcolare l'intera tabella, con un costo di tempo $O(N \cdot B \cdot P)$ e di memoria $\Theta(N \cdot B)$ (a cui si sommano gli $O(N)$ record di attivazione sullo stack della ricorsione). Nella pratica, però, i costi effettivi dei contratti lasciano molti stati $(i, b)$ non raggiungibili a ritroso da $(N, B)$. La variante top-down calcola solo gli stati davvero necessari alla soluzione, risultando nettamente più rapida del bottom-up sui nostri scenari di prova.
+Secondo la teoria, nel caso peggiore l'algoritmo deve calcolare l'intera tabella, con un costo di tempo $O(N \cdot B \cdot P)$ e di memoria $\Theta(N \cdot B)$ (a cui si sommano gli $O(N)$ record di attivazione sullo stack della ricorsione). Nella pratica, però, i costi effettivi dei contratti lasciano molti stati $(i, b)$ non raggiungibili a ritroso da $(N, B)$. La variante top-down calcola solo gli stati davvero necessari alla soluzione, risultando nettamente più rapida del bottom-up sugli scenari di prova considerati.
 
 \subsubsection{Filtraggio Preliminare dei Candidati Dominati}
 Un'ulteriore ottimizzazione consiste nel ridurre in partenza il numero di candidati per ciascun ruolo tramite una procedura di \textit{filtraggio preliminare}, scartando i candidati dominati.
-Poiché per ogni ruolo si seleziona al massimo un giocatore, considerati due atleti $p_1, p_2$ dello stesso ruolo $i$, diciamo che $p_1$ \textbf{domina} $p_2$ se:
+Poiché per ogni ruolo si seleziona al massimo un giocatore, considerati due atleti $p_1, p_2$ dello stesso ruolo $i$, si dice che $p_1$ \textbf{domina} $p_2$ se:
 \begin{equation}
 	c_{i, p_1} \le c_{i, p_2} \quad \wedge \quad v_{i, p_1} \ge v_{i, p_2}
 \end{equation}
@@ -257,7 +257,7 @@ I tempi di calcolo misurati per ciascun algoritmo sui 10 scenari sono riassunti 
 
 All'aumentare del budget discreto $B$, i tempi di esecuzione del Bottom-Up base e delle sue varianti principali mostrano una crescita chiaramente lineare. Poiché il numero di ruoli $N = 9$ e il numero di candidati $P = 30$ sono mantenuti costanti in tutti gli scenari, la dimensione complessiva dell'istanza scala in modo direttamente proporzionale a $B$. Ad esempio, confrontando gli scenari estremi ($B = 3500$ e $B = 8000$), a fronte di una crescita del budget di circa $2.29$ volte si registra un incremento dei tempi di calcolo di circa $2.36$ volte, confermando fedelmente l'andamento previsto dall'analisi asintotica $\Theta(N \cdot B \cdot P)$.
 
-Un aspetto interessante riguarda il confronto tra il Bottom-Up su matrice e la variante a vettore singolo. Anche se quest'ultima opera su una sola riga anziché sull'intera tabella, il numero totale di controlli e aggiornamenti interni rimane identico. Per verificare questa equivalenza abbiamo calcolato la discrepanza percentuale tra i tempi:
+Un aspetto interessante riguarda il confronto tra il Bottom-Up su matrice e la variante a vettore singolo. Anche se quest'ultima opera su una sola riga anziché sull'intera tabella, il numero totale di controlli e aggiornamenti interni rimane identico. Per verificare questa equivalenza è stata calcolata la discrepanza percentuale tra i tempi:
 \begin{equation}
 	\Delta_{\text{time}}\% = \frac{T_{\text{vettore}} - T_{\text{matrice}}}{T_{\text{matrice}}} \times 100
 \end{equation}
@@ -302,7 +302,7 @@ Per quanto riguarda il Top-Down, l'occupazione di memoria segue da vicino il pro
 \end{itemize}
 
 \subsubsection{Ricostruzione della Rosa e Verifica dei Risultati}
-Abbiamo verificato che le diverse strategie di ricostruzione producano la stessa soluzione ottima. Su tutti i 10 scenari analizzati, la ricostruzione basata sulla matrice decisionale $s$ e quella eseguita direttamente sulla matrice dei valori $m$ identificano esattamente la stessa combinazione di giocatori, confermando la piena correttezza della risalita senza matrice ausiliaria e attestando il valore ottimo sempre a $63.0$ WAR con la copertura di tutti i 9 ruoli previsti.
+È stato verificato che le diverse strategie di ricostruzione producano la stessa soluzione ottima. Su tutti i 10 scenari analizzati, la ricostruzione basata sulla matrice decisionale $s$ e quella eseguita direttamente sulla matrice dei valori $m$ identificano esattamente la stessa combinazione di giocatori, confermando la piena correttezza della risalita senza matrice ausiliaria e attestando il valore ottimo sempre a $63.0$ WAR con la copertura di tutti i 9 ruoli previsti.
 
 \begin{figure}[!htbp]
 	\centering
