@@ -67,7 +67,7 @@ class PerformancePlotter:
             ax_mem.set_yscale("log")
 
         scale_text = " (Scala Log-Log)" if self.log_optimal_val else ""
-        ax_time.set_title(f"Tempo di Calcolo Valore Ottimo{scale_text}")
+        ax_time.set_title(f"(a) Tempo di Calcolo Valore Ottimo{scale_text}")
         ax_time.set_xlabel("Dimensione Istanza (N * B * P)")
         ax_time.set_ylabel("Tempo (ms)")
         ax_time.grid(
@@ -78,7 +78,7 @@ class PerformancePlotter:
         )
         ax_time.legend()
 
-        ax_mem.set_title(f"Occupazione Memoria RAM{scale_text}")
+        ax_mem.set_title(f"(b) Occupazione Memoria RAM{scale_text}")
         ax_mem.set_xlabel("Dimensione Tabella (N * B)")
         ax_mem.set_ylabel("Picco Memoria (KiB)")
         ax_mem.grid(
