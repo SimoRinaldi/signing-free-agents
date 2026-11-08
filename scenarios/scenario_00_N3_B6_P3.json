@@ -1,0 +1,67 @@
+{
+  "scenario_name": "scenario_00_N3_B6_P3",
+  "budget": 600000,
+  "cost_unit": 100000,
+  "roles": [
+    {
+      "role_name": "Starting Pitcher",
+      "candidates": [
+        {
+          "name": "Tarik Skubal",
+          "cost": 300000,
+          "war": 6.6
+        },
+        {
+          "name": "Zack Wheeler",
+          "cost": 200000,
+          "war": 5.8
+        },
+        {
+          "name": "Paul Skenes",
+          "cost": 100000,
+          "war": 4.5
+        }
+      ]
+    },
+    {
+      "role_name": "Catcher",
+      "candidates": [
+        {
+          "name": "William Contreras",
+          "cost": 300000,
+          "war": 5.4
+        },
+        {
+          "name": "Cal Raleigh",
+          "cost": 200000,
+          "war": 4.2
+        },
+        {
+          "name": "Will Smith",
+          "cost": 100000,
+          "war": 3.1
+        }
+      ]
+    },
+    {
+      "role_name": "Shortstop",
+      "candidates": [
+        {
+          "name": "Bobby Witt Jr",
+          "cost": 300000,
+          "war": 7.2
+        },
+        {
+          "name": "Gunnar Henderson",
+          "cost": 200000,
+          "war": 6.1
+        },
+        {
+          "name": "Francisco Lindor",
+          "cost": 100000,
+          "war": 4.8
+        }
+      ]
+    }
+  ]
+}

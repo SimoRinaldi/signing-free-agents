@@ -1,0 +1,14 @@
+\section{Limitazioni Riscontrate}
+Durante la realizzazione del progetto e l'analisi dei risultati sperimentali sono emerse alcune limitazioni pratiche, legate sia al modello teorico sia alle scelte implementative adottate:
+
+\begin{itemize}
+	\item \textbf{Dipendenza dal budget:} La complessità degli algoritmi dipende direttamente dal valore numerico del budget $B$. Avendo impostato la scala a $100\,000$ dollari ($\text{COST\_UNIT} = 100\,000$), $B$ rimane nell'ordine di qualche migliaio e i tempi di esecuzione restano inferiori al secondo. Se però si volesse una precisione al singolo dollaro per gestire cifre contrattuali esatte, $B$ salirebbe a centinaia di milioni: in quel caso la tabella dinamica diventerebbe del tutto ingestibile, rendendo i tempi di calcolo proibitivi ed esaurendo rapidamente la memoria RAM.
+
+	\item \textbf{Vettore singolo e impossibilità di ricostruire la rosa:} La variante a vettore singolo consente un notevole risparmio di memoria, ma presenta il limite di non poter ricostruire la rosa ottimale. Poiché l'unico array viene sovrascritto a ogni ruolo, alla fine dell'esecuzione si ottiene unicamente il valore del WAR massimo raggiungibile, perdendo la traccia di quali giocatori siano stati effettivamente acquistati. Questa variante è quindi utilizzabile solo quando interessa il valore numerico della soluzione e non l'elenco dei candidati selezionati.
+
+	\item \textbf{Efficacia del filtro legata alla distribuzione dei candidati:} Il filtro preliminare è risultato molto efficace sugli scenari, riducendo i candidati da 30 a circa 10 per ciascun ruolo, perché nei dati di partenza erano presenti molti candidati svantaggiosi (con costo elevato e WAR ridotto). Tuttavia, il beneficio del filtro dipende interamente dai dati: se tutti i giocatori con costo maggiore avessero anche un WAR strettamente superiore, il filtro non riuscirebbe a scartare nessuno, introducendo soltanto il tempo aggiuntivo necessario a ordinare le liste.
+
+	\item \textbf{Gestione delle parità e soluzioni ottime multiple:} Gli algoritmi aggiornano la soluzione solo quando trovano un valore strettamente superiore (\texttt{war > m[i][b]}). Se ci sono più giocatori con lo stesso costo e lo stesso rendimento, il programma ne seleziona deterministicamente solo uno (il primo incontrato). Gli algoritmi non sono quindi strutturati per enumerare o mostrare tutte le rose ottimali alternative equivalenti, ma ne restituiscono sempre una singola.
+\end{itemize}
+
+\newpage

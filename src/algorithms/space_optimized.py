@@ -1,7 +1,7 @@
 from math import floor
 
 
-# Metodo per calcolare il valore ottimo senza instanziare l'intera matrice m, ma solo un vettore di dimensione B+1
+# Metodo per calcolare il valore ottimo senza istanziare l'intera matrice m, ma solo un vettore di dimensione B+1
 def compute_optimal_war_with_one_vector(N, X, players, cost_unit=100000):
     B = floor(X / cost_unit)
 

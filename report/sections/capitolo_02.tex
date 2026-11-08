@@ -1,0 +1,68 @@
+\section{Scelte Tecnologiche e Dettagli Implementativi}
+
+\subsection{Ambiente di Sviluppo e Strumenti Utilizzati}
+Per la gestione del runtime e l'isolamento delle dipendenze è stato impiegato l'interprete Python~3.14 all'interno di un ambiente virtuale dedicato (\texttt{venv}), garantendo la piena riproducibilità delle librerie specificate nel file \texttt{requirements.txt}.
+
+Il tracciamento del codice sorgente e la collaborazione sono stati gestiti tramite il sistema di controllo di versione Git, mentre la relazione è redatta in \LaTeX{} per la formattazione di equazioni, algoritmi e tabelle.
+
+\subsection{Linguaggio di Programmazione e Librerie}
+Python è stato adottato come linguaggio di riferimento per la chiarezza sintattica del codice e per la disponibilità di ottime librerie dedicate all'analisi delle prestazioni.
+Nello specifico, l'implementazione si avvale sia di moduli della libreria standard sia di pacchetti esterni:
+\begin{itemize}
+	\item \textbf{Libreria standard di Python:}
+	      \begin{itemize}
+		      \item \texttt{dataclasses} e \texttt{typing}: impiegati per formalizzare le entità cardine del dominio (\texttt{Player}, \texttt{Role}, \texttt{Scenario}, \texttt{RosterSolution}, \texttt{BenchmarkMetric}) secondo un modello tipizzato e coerente. L'attributo \texttt{frozen=True} garantisce l'immutabilità delle istanze, prevenendo alterazioni accidentali dei dati durante l'esecuzione degli algoritmi.
+		      \item \texttt{pathlib} e \texttt{json}: per gestire i percorsi dei file in modo indipendente dal sistema operativo e per caricare gli scenari di test in formato JSON.
+		      \item \texttt{time.perf\_counter}: per misurare i tempi di calcolo con la massima precisione offerta dal sistema.
+		      \item \texttt{tracemalloc}: per misurare la memoria allocata esclusivamente dalle strutture dati dell'algoritmo (come le matrici dinamiche), escludendo l'overhead dell'interprete Python e la memoria occupata dai moduli importati.
+	      \end{itemize}
+	\item \textbf{Librerie esterne:}
+	      \begin{itemize}
+		      \item \texttt{pandas} e \texttt{numpy}: impiegate nell'infrastruttura di benchmark per l'aggregazione, l'ordinamento e l'esportazione dei risultati su file CSV.
+		      \item \texttt{matplotlib}: impiegata per la generazione dei grafici di scalabilità temporale e spaziale e della tabella comparativa riassuntiva.
+	      \end{itemize}
+\end{itemize}
+
+\subsection{Architettura del Software e Modularità}
+Per mantenere i file e il codice ordinati e separare chiaramente la logica risolutiva dal caricamento dei dati e dalle misurazioni, il progetto all'interno di \texttt{src/} è suddiviso in tre cartelle principali, ciascuna con uno scopo specifico:
+\begin{enumerate}
+	\item \textbf{\texttt{core/}}: racchiude la definizione degli oggetti di dominio (\texttt{models.py}) e la logica di caricamento e validazione degli scenari da file JSON (\texttt{loader.py}).
+	\item \textbf{\texttt{algorithms/}}: ospita l'implementazione algoritmica pura delle funzioni e delle relative varianti. Le procedure operano direttamente su matrici e liste di dati, rimanendo completamente disaccoppiate da operazioni di I/O o di cronometraggio.
+	\item \textbf{\texttt{benchmark/}}: dedicata all'analisi comparativa tra gli algoritmi. I file \texttt{profiler.py}, \texttt{exporter.py} e \texttt{plotter.py} gestiscono rispettivamente la rilevazione di tempi e memoria, il salvataggio dei risultati in CSV e la produzione dei grafici.
+\end{enumerate}
+L'esecuzione complessiva è gestita dallo script \texttt{main.py}, che esegue uno dopo l'altro gli scenari, raccoglie i risultati e produce i file di output.
+
+\subsection{Scelte Implementative Rilevanti}
+Durante l'implementazione degli algoritmi, sono state introdotte alcune accortezze per ottimizzare i tempi e garantire la correttezza dei risultati:
+
+\subsubsection{Discretizzazione del Budget e dei Costi}
+Poiché i compensi contrattuali e il budget sono espressi in unità monetarie reali nell'ordine dei milioni di dollari, è stata definita una costante di scala $\text{COST\_UNIT} = 100\,000$. Ciò consente di mappare il budget $X$ e i costi dei singoli atleti su valori interi discreti:
+\begin{equation}
+	B = \lfloor X / \text{COST\_UNIT} \rfloor, \qquad \mathit{cost}_{i, k} = \lfloor \mathit{cost}_{i, k}^{\text{nom}} / \text{COST\_UNIT} \rfloor
+\end{equation}
+Tale discretizzazione permette l'accesso alle celle della tabella dinamica tramite indici interi diretti in tempo $\Theta(1)$, prevenendo al contempo errori di approssimazione dovuti all'aritmetica floating-point durante il controllo del budget.
+
+\subsubsection{Rappresentazione delle Tabelle Dinamiche}
+Per costruire le tabelle della programmazione dinamica sono state usate le liste native di Python (\texttt{list} di \texttt{list}) preallocate, invece di array esterni come quelli di NumPy. Poiché l'algoritmo accede e aggiorna le singole celle una alla volta all'interno di cicli annidati, le liste native risultano più veloci e non introducono rallentamenti aggiuntivi. Inoltre, la copia della riga precedente per la scelta base ($m[i, b] \gets m[i - 1, b]$) è eseguita rapidamente tramite la sintassi di slicing \texttt{m[i][:] = m[i-1][:]}.
+
+\subsubsection{Trade-off nella Ricostruzione della Rosa: con e senza Matrice \texorpdfstring{$s$}{s}}
+Per la determinazione della rosa ottimale sono state implementate due strategie complementari, delineando un chiaro compromesso tra occupazione spaziale e complessità temporale di ricostruzione:
+\begin{itemize}
+	\item \textbf{Ricostruzione con matrice $s$:} prevede l'allocazione di una matrice ausiliaria $s[i, b]$ per memorizzare l'indice della scelta ottima a ogni passo. La ricostruzione della rosa si compie risalendo la matrice a ritroso in tempo $\Theta(N)$, con un costo addizionale di memoria pari a $(N+1) \times (B+1)$ interi.
+	\item \textbf{Ricostruzione senza matrice $s$:} evita del tutto l'allocazione della tabella $s$, determinando la soluzione a ritroso direttamente sulla matrice $m$. Per ciascun ruolo $i$, viene identificato il candidato $p$ che soddisfa $m[i-1, b - \mathit{cost}_{i, p}] + \mathit{war}_{i, p} = m[i, b]$ entro una tolleranza numerica $\varepsilon = 10^{-9}$ (necessaria per gestire la rappresentazione floating-point dei WAR). Il tempo di risalita diviene $O(N \cdot P)$, ma la memoria richiesta nella fase di calcolo risulta dimezzata.
+\end{itemize}
+
+\subsubsection{Scansione a Ritroso nell'Ottimizzazione a Vettore Singolo}
+Nella variante a memoria compressa, la tabella bidimensionale $m$ è ridotta a un singolo vettore di dimensione $B+1$, abbattendo la complessità spaziale da $\Theta(N \cdot B)$ a $\Theta(B)$. Per rispettare il vincolo di mutua esclusività (al più un ingaggio per ruolo), l'aggiornamento degli stati sul budget viene eseguito in senso decrescente da $B$ verso $0$. L'inversione della scansione impedisce che l'elaborazione di un candidato sovrascriva i valori calcolati allo stadio decisionale precedente, garantendo che nessun atleta del medesimo ruolo venga selezionato più volte nel medesimo passaggio.
+
+\subsubsection{Filtraggio Preliminare}
+Prima di eseguire gli algoritmi, i candidati di ciascun ruolo vengono filtrati per scartare quelli non convenienti. Ordinando i giocatori per costo crescente, si tengono solo quelli che offrono un rendimento WAR strettamente superiore rispetto a chi costa meno. Infatti, se un giocatore ha un costo maggiore o uguale a un altro ma presenta un WAR minore o uguale, non verrà mai selezionato nella soluzione ottima e può essere eliminato subito. In questo modo il numero di candidati per ruolo scende da $P$ a un valore $P'$ più piccolo, velocizzando il calcolo per tutti gli algoritmi che non utilizzano la matrice $s$.
+
+\subsection{Metodologia di Misurazione delle Prestazioni}
+Per rendere i test affidabili e confrontabili:
+\begin{itemize}
+	\item \textbf{Misurazione del tempo di calcolo:} ciascuna esecuzione viene ripetuta per $K = 15$ iterazioni, assumendo come metrica il valore minimo. Tale approccio consente di escludere i rallentamenti casuali causati dal sistema operativo, misurando l'effettivo tempo di calcolo dell'algoritmo.
+	\item \textbf{Misurazione della memoria RAM:} il consumo di memoria è quantificato campionando il picco di byte tracciati tramite \texttt{tracemalloc} tra l'inizio e la fine dell'esecuzione, isolando lo spazio occupato dalle matrici e dai vettori dell'algoritmo ed escludendo la memoria di base già occupata dall'interprete Python e dai moduli importati.
+\end{itemize}
+
+\newpage
