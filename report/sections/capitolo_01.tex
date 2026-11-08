@@ -1,22 +1,18 @@
 \section{Modellazione e Algoritmi Fondamentali}
 
 \subsection{Descrizione del Problema e Formulazione Matematica}
-Per questo elaborato è stato scelto il problema dell'ingaggio dei giocatori svincolati (\textit{Signing Free-Agent Baseball Players}). Trae la propria formulazione canonica dal Problema~14-12 del testo di Cormen et al.~\cite{clrs}. Nel dominio dell'ottimizzazione combinatoria, si configura come un'istanza del \textit{Multiple-Choice Knapsack Problem} (MCKP)~\cite{kellerer2004knapsack}, variante del classico problema dello zaino in cui l'insieme degli oggetti selezionabili è partizionato in classi disgiunte e mutualmente esclusive. Lo scenario decisionale modella l'obiettivo della dirigenza di una squadra sportiva che, a fronte di un budget finanziario prefissato, mira a massimizzare la competitività globale della formazione titolare ingaggiando atleti sul mercato degli \textit{svincolati}, nel rispetto del vincolo di copertura dei ruoli e del tetto massimo di budget spendibile.
+Per questo elaborato è stato scelto il problema dell'ingaggio dei giocatori svincolati (\textit{Signing Free-Agent Baseball Players}). Trae la propria formulazione canonica dal Problema~14-12 del testo di Cormen et al.\footnote{T.~H.~Cormen, C.~E.~Leiserson, R.~L.~Rivest, C.~Stein, \textit{Introduction to Algorithms}, 4th ed., MIT Press, Cambridge, MA, 2022.}. Nel dominio dell'ottimizzazione combinatoria, si configura come un'istanza del \textit{Multiple-Choice Knapsack Problem} (MCKP), variante del classico problema dello zaino in cui l'insieme degli oggetti selezionabili è partizionato in classi disgiunte e mutualmente esclusive. Lo scenario decisionale modella l'obiettivo della dirigenza di una squadra sportiva che, a fronte di un budget finanziario prefissato, mira a massimizzare la competitività globale della formazione ingaggiando atleti sul mercato degli \textit{svincolati}, nel rispetto del vincolo di copertura dei ruoli e del tetto massimo di budget spendibile.
 
-Formalmente, un'istanza del problema è definita da un budget finanziario nominale $X \in \mathbb{R}^+$, da un insieme di $N$ ruoli (indicizzati con $i \in \{1, \dots, N\}$, dove nel contesto del baseball si assumono i canonici $N = 9$ ruoli difensivi) e da una collezione di $P_i$ candidati svincolati disponibili per ciascun ruolo $i$. Ciascun candidato $k \in \{1, \dots, P_i\}$ è univocamente caratterizzato da un costo contrattuale d'ingaggio $\mathit{cost}_{i,k}$ e da una misura quantitativa di rendimento tecnico $v_{i,k} \ge 0$, espressa tramite la statistica \textbf{WAR} (\textit{Wins Above Replacement}).
+Formalmente, un'istanza del problema è definita da un budget finanziario nominale $X \in \mathbb{R}^+$, da un insieme di $N$ ruoli (indicizzati con $i \in \{1, \dots, N\}$, dove nel contesto del baseball si assumono i canonici $N = 9$ ruoli difensivi) e da una collezione di $P$ candidati svincolati disponibili per ciascun ruolo (indicizzati con $k \in \{1, \dots, P\}$). Ciascun candidato è univocamente caratterizzato da un compenso contrattuale nominale $\mathit{cost}_{i,k}^{\text{nom}} \in \mathbb{R}^+$ e da una misura quantitativa di rendimento tecnico $\mathit{war}_{i,k} \ge 0$, espressa tramite la statistica \textbf{WAR} (\textit{Wins Above Replacement}).
 
-In ambito analitico, il WAR esprime il contributo complessivo di un atleta in termini di vittorie incrementali apportate alla squadra rispetto a un giocatore di livello rimpiazzo (\textit{replacement-level player}), ovvero una riserva liberamente attingibile al salario minimo o dal vivaio, il cui rendimento incrementale convenzionale è posto pari a zero. Sul piano computazionale, l'adozione del WAR soddisfa due requisiti cardine per l'ottimizzazione:
-la \textit{linearità additiva}, per cui il rendimento totale della squadra è esattamente pari alla somma algebrica dei valori WAR dei singoli giocatori;
-la \textit{coerenza del caso base}, in base alla quale la decisione di non ingaggiare alcun candidato in un determinato ruolo equivale a confermare il giocatore già presente in rosa, comportando un costo addizionale nullo e un apporto incrementale di $0.0$ WAR.
+Per specifica di progetto, i compensi monetari sono espressi come multipli interi di una costante di discretizzazione $\text{COST\_UNIT} = 100\,000$. È pertanto possibile ricondurre l'istanza a una formulazione intera esatta definendo il budget discreto $B = \lfloor X / \text{COST\_UNIT} \rfloor$ e i corrispondenti costi interi scalati $\mathit{cost}_{i,k} = \lfloor \mathit{cost}_{i,k}^{\text{nom}} / \text{COST\_UNIT} \rfloor$.
 
-Per specifica di progetto, i compensi monetari sono espressi come multipli interi di una costante di discretizzazione $\text{COST\_UNIT} = 100\,000$. È pertanto possibile ricondurre l'istanza a una formulazione intera esatta definendo il budget discreto $B = \lfloor X / \text{COST\_UNIT} \rfloor$ e i corrispondenti costi interi scalati $c_{i,k} = \lfloor \mathit{cost}_{i,k} / \text{COST\_UNIT} \rfloor$.
-
-Associando a ciascun candidato una variabile di decisione binaria $x_{i,k} \in \{0, 1\}$, indicante se il candidato $k$ del ruolo $i$ viene ingaggiato ($x_{i,k} = 1$) o meno ($x_{i,k} = 0$), il problema si formalizza come il seguente programma lineare intero 0/1:
+Associando a ciascun candidato una variabile di decisione binaria $x_{i,k} \in \{0, 1\}$, indicante se il candidato $k$ del ruolo $i$ viene ingaggiato ($x_{i,k} = 1$) o meno ($x_{i,k} = 0$), il problema si formalizza come segue:
 \begin{align}
-	\max \quad              & \sum_{i=1}^N \sum_{k=1}^{P_i} v_{i,k} \, x_{i,k} \label{eq:objective}                                                     \\
-	\text{soggetto a} \quad & \sum_{k=1}^{P_i} x_{i,k} \le 1 \quad \forall i \in \{1, \dots, N\} \label{eq:constraint_roster}                           \\
-	                        & \sum_{i=1}^N \sum_{k=1}^{P_i} c_{i,k} \, x_{i,k} \le B \label{eq:constraint_budget}                                       \\
-	                        & x_{i,k} \in \{0, 1\} \quad \forall i \in \{1, \dots, N\}, \; \forall k \in \{1, \dots, P_i\} \label{eq:constraint_binary}
+	\max \quad              & \sum_{i=1}^N \sum_{k=1}^P \mathit{war}_{i,k} \, x_{i,k} \label{eq:objective}                                                     \\
+	\text{soggetto a} \quad & \sum_{k=1}^P x_{i,k} \le 1 \quad \forall i \in \{1, \dots, N\} \label{eq:constraint_roster}                           \\
+	                        & \sum_{i=1}^N \sum_{k=1}^P \mathit{cost}_{i,k} \, x_{i,k} \le B \label{eq:constraint_budget}                                       \\
+	                        & x_{i,k} \in \{0, 1\} \quad \forall i \in \{1, \dots, N\}, \; \forall k \in \{1, \dots, P\} \label{eq:constraint_binary}
 \end{align}
 Il vincolo~\eqref{eq:constraint_roster} impone l'esclusività di ruolo (al massimo un acquisto per posizione), il vincolo~\eqref{eq:constraint_budget} garantisce il rispetto del tetto di spesa complessivo $B$, mentre la funzione obiettivo~\eqref{eq:objective} massimizza il WAR complessivo della rosa. La risoluzione dell'istanza richiede di determinare sia il valore scalare ottimo conseguibile, sia l'esatta configurazione della rosa che lo realizza, corredata dal costo cumulativo effettivo.
 
@@ -38,33 +34,32 @@ Sia $R^*$ una soluzione ottima per il sottoproblema generico $(i, b)$, ovvero un
 	\item \textbf{Caso 1: Nessun candidato viene ingaggiato per il ruolo $i$.} \\
 	      In questo caso la rosa $R^*$ impiega unicamente giocatori appartenenti ai primi $i-1$ ruoli con una spesa complessiva non superiore a $b$. Di conseguenza, $R^*$ costituisce una soluzione ammissibile per il sottoproblema $(i-1, b)$. Se per assurdo $R^*$ non fosse ottima per $(i-1, b)$, esisterebbe una rosa ammissibile $R'$ sui primi $i-1$ ruoli, con spesa $\le b$, tale che $\text{WAR}(R') > \text{WAR}(R^*)$. Poiché $R'$ non alloca alcun giocatore al ruolo $i$, essa risulterebbe ammissibile anche per $(i, b)$ con rendimento $\text{WAR}(R') > \text{WAR}(R^*)$, contraddicendo l'ipotesi di ottimalità globale di $R^*$ su $(i, b)$. Pertanto, $R^*$ deve essere ottima per $(i-1, b)$.
 
-	\item \textbf{Caso 2: Viene ingaggiato il candidato $p$ per il ruolo $i$, avente costo scalato $c_{i, p} \le b$ e rendimento $v_{i, p}$.} \\
-	      Sottraendo $p$ dalla soluzione ottima, consideriamo la sottorosa residua $R' = R^* \setminus \{p\}$. Poiché la spesa complessiva di $R^*$ è limitata da $b$, la spesa impegnata da $R'$ sui primi $i-1$ ruoli non eccede $b - c_{i, p}$; inoltre, la separazione dei ruoli garantisce che $R'$ contenga al più un giocatore per ciascuna delle prime $i-1$ posizioni. Dunque, $R'$ è ammissibile per il sottoproblema $(i-1, b - c_{i, p})$, con rendimento pari a $\text{WAR}(R') = \text{WAR}(R^*) - v_{i, p}$. \\
-	      Se per assurdo $R'$ non fosse ottima per $(i-1, b - c_{i, p})$, esisterebbe una configurazione ammissibile alternativa $R''$ sui primi $i-1$ ruoli avente costo $\le b - c_{i, p}$ e rendimento strettamente superiore: $\text{WAR}(R'') > \text{WAR}(R')$.
-	      Sostituendo $R'$ con $R''$ e reintroducendo il candidato $p$, costruiamo la nuova rosa $R_{\text{new}} = R'' \cup \{p\}$. Tale rosa rispetta il vincolo di ruolo (include $p$ al ruolo $i$ e al più un giocatore per ciascuno dei primi $i-1$ ruoli) e il vincolo finanziario, poiché la spesa totale risulta $\le (b - c_{i, p}) + c_{i, p} = b$. Il rendimento complessivo ottenuto è:
+	\item \textbf{Caso 2: Viene ingaggiato il candidato $p$ per il ruolo $i$, avente costo scalato $\mathit{cost}_{i, p} \le b$ e rendimento $\mathit{war}_{i, p}$.} \\
+	      Sottraendo $p$ dalla soluzione ottima, consideriamo la sottorosa residua $R' = R^* \setminus \{p\}$. Poiché la spesa complessiva di $R^*$ è limitata da $b$, la spesa impegnata da $R'$ sui primi $i-1$ ruoli non eccede $b - \mathit{cost}_{i, p}$; inoltre, la separazione dei ruoli garantisce che $R'$ contenga al più un giocatore per ciascuna delle prime $i-1$ posizioni. Dunque, $R'$ è ammissibile per il sottoproblema $(i-1, b - \mathit{cost}_{i, p})$, con rendimento pari a $\text{WAR}(R') = \text{WAR}(R^*) - \mathit{war}_{i, p}$. \\
+	      Se per assurdo $R'$ non fosse ottima per $(i-1, b - \mathit{cost}_{i, p})$, esisterebbe una configurazione ammissibile alternativa $R''$ sui primi $i-1$ ruoli avente costo $\le b - \mathit{cost}_{i, p}$ e rendimento strettamente superiore: $\text{WAR}(R'') > \text{WAR}(R')$.
+	      Sostituendo $R'$ con $R''$ e reintroducendo il candidato $p$, costruiamo la nuova rosa $R_{\text{new}} = R'' \cup \{p\}$. Tale rosa rispetta il vincolo di ruolo (include $p$ al ruolo $i$ e al più un giocatore per ciascuno dei primi $i-1$ ruoli) e il vincolo finanziario, poiché la spesa totale risulta $\le (b - \mathit{cost}_{i, p}) + \mathit{cost}_{i, p} = b$. Il rendimento complessivo ottenuto è:
 	      \[
-		      \text{WAR}(R_{\text{new}}) = \text{WAR}(R'') + v_{i, p} > \text{WAR}(R') + v_{i, p} = \text{WAR}(R^*)
+		      \text{WAR}(R_{\text{new}}) = \text{WAR}(R'') + \mathit{war}_{i, p} > \text{WAR}(R') + \mathit{war}_{i, p} = \text{WAR}(R^*)
 	      \]
-	      La configurazione ammissibile $R_{\text{new}}$ conseguirebbe un WAR strettamente superiore a quello della soluzione ottima $R^*$, generando una contraddizione. Ne consegue che la sottorosa $R'$ deve essere una soluzione ottima per il sottoproblema $(i-1, b - c_{i, p})$.
+	      La configurazione ammissibile $R_{\text{new}}$ conseguirebbe un WAR strettamente superiore a quello della soluzione ottima $R^*$, generando una contraddizione. Ne consegue che la sottorosa $R'$ deve essere una soluzione ottima per il sottoproblema $(i-1, b - \mathit{cost}_{i, p})$.
 \end{enumerate}
 In entrambi i casi, la soluzione ottima globale incorpora soluzioni ottime per i rispettivi sottoproblemi, certificando la validità della proprietà di sottostruttura ottima.
 
 \subsubsection{Sovrapposizione dei Sottoproblemi}
 La seconda condizione per l'efficacia della programmazione dinamica è l'esistenza di sottoproblemi comuni ricorsivamente condivisi. Lo spazio di tutti i possibili sottoproblemi distinti è circoscritto alla griglia discreta degli indici $(i, b)$, per un totale complessivo di $(N + 1) \times (B + 1)$ stati.
 
-% TODO: Questa spiegazione da rivedere
-Un approccio ricorsivo ingenuo privo di memorizzazione compirebbe a ogni livello $i$ una diramazione su $P_i + 1$ scelte alternative (non ingaggiare nessuno o selezionare uno tra i $P_i$ candidati), sviluppando un albero di ricorsione di profondità $N$ con una complessità temporale nell'ordine di $\Omega((P + 1)^N)$, computazionalmente intrattabile anche per istanze di modesta entità. Tuttavia, sequenze distinte di decisioni sui primi ruoli confluiscono frequentemente nel medesimo stato residuo $(i, b)$: allocazioni finanziarie differenti ma equivalenti in termini di spesa cumulata portano allo stesso budget residuo per i ruoli successivi. Memorizzando sistematicamente i risultati parziali in una struttura dati tabellare, ciascun sottoproblema viene risolto una sola volta, consentendo consultazioni in tempo costante $\Theta(1)$ ed eliminando l'esplosione combinatoria dell'albero di decisione.
+Un approccio ricorsivo ingenuo privo di memorizzazione compirebbe a ogni livello $i$ una diramazione su $P + 1$ scelte alternative (non ingaggiare nessuno o selezionare uno tra i $P$ candidati), sviluppando un albero di ricorsione di profondità $N$ con una complessità temporale nell'ordine di $\Omega((P + 1)^N)$, computazionalmente intrattabile anche per istanze di modesta entità. Tuttavia, sequenze distinte di decisioni sui primi ruoli confluiscono frequentemente nel medesimo stato residuo $(i, b)$: allocazioni finanziarie differenti ma equivalenti in termini di spesa cumulata portano allo stesso budget residuo per i ruoli successivi. Memorizzando sistematicamente i risultati parziali in una struttura dati tabellare, ciascun sottoproblema viene risolto una sola volta, consentendo consultazioni in tempo costante $\Theta(1)$ ed eliminando l'esplosione combinatoria dell'albero di decisione.
 
 \subsubsection{Equazione di Ricorrenza}
 In virtù delle proprietà dimostrate, il valore $m[i, b]$ della soluzione ottima per lo stato $(i, b)$ è calcolabile mediante la seguente equazione di ricorrenza di Bellman:
 \begin{equation}
 	m[i, b] = \begin{cases}
 		0 & \text{se } i = 0 \text{ oppure } b = 0                       \\
-		\max \left( m[i - 1, b], \; \max\limits_{\substack{0 \le j < P_i \\ c_{i, j} \le b}} \{ m[i - 1, b - c_{i, j}] + v_{i, j} \} \right) & \text{se } i > 0 \text{ e } b > 0
+		\max \left( m[i - 1, b], \; \max\limits_{\substack{1 \le k \le P \\ \mathit{cost}_{i, k} \le b}} \{ m[i - 1, b - \mathit{cost}_{i, k}] + \mathit{war}_{i, k} \} \right) & \text{se } i > 0 \text{ e } b > 0
 	\end{cases}
 	\label{eq:bellman}
 \end{equation}
-Il caso base stabilisce che, in assenza di ruoli disponibili ($i = 0$) o in assenza di budget ($b = 0$), nessun ingaggio incrementale è consentito, attestando il WAR a $0.0$. Nel passo ricorsivo, il primo termine dell'operatore $\max$ esprime la scelta conservativa di non effettuare alcun ingaggio al ruolo $i$, preservando il rendimento $m[i-1, b]$ conseguito sui ruoli precedenti senza assorbire budget. Il secondo termine valuta l'ingaggio di ciascun candidato ammissibile $j \in \{0, \dots, P_i - 1\}$ avente costo $c_{i,j} \le b$, sommando il rispettivo valore $v_{i, j}$ all'ottimo del sottoproblema residuo $m[i - 1, b - c_{i, j}]$.
+Il caso base stabilisce che, in assenza di ruoli disponibili ($i = 0$) o in assenza di budget ($b = 0$), nessun ingaggio incrementale è consentito, attestando il WAR a $0.0$. Nel passo ricorsivo, il primo termine dell'operatore $\max$ esprime la scelta conservativa di non effettuare alcun ingaggio al ruolo $i$, preservando il rendimento $m[i-1, b]$ conseguito sui ruoli precedenti senza assorbire budget. Il secondo termine valuta l'ingaggio di ciascun candidato ammissibile $k \in \{1, \dots, P\}$ avente costo $\mathit{cost}_{i,k} \le b$, sommando il rispettivo valore $\mathit{war}_{i, k}$ all'ottimo del sottoproblema residuo $m[i - 1, b - \mathit{cost}_{i, k}]$.
 
 \subsection{Algoritmi Risolutivi e Pseudocodici}
 Il processo risolutivo è articolato in due procedure complementari:
@@ -74,9 +69,9 @@ la procedura \textsc{Reconstruct-Optimal-Roster} (Algoritmo~\ref{alg:reconstruct
 \subsubsection{Calcolo del Valore Ottimo e Tracciamento delle Scelte}
 L'Algoritmo~\ref{alg:compute_optimal_war} implementa un approccio \textit{bottom-up} iterativo. Vengono allocate due matrici di dimensione $(N + 1) \times (B + 1)$: la tabella $m$, inizializzata a $0.0$, destinata a contenere i massimi valori di WAR per ogni sottoproblema, e la tabella $s$, inizializzata a $-1$, impiegata per registrare l'indice del candidato selezionato per ciascuno stato (convenzionalmente $-1$ indica la mancata acquisizione nel ruolo corrente).
 
-L'algoritmo procede per stadi crescenti del ruolo $i \in \{1, \dots, N\}$. Per ogni ruolo, la riga corrente viene inizialmente copiata dalla riga precedente ($m[i, b] \gets m[i-1, b]$), incorporando la decisione di base (nessun acquisto). Successivamente, si esamina ciascun candidato $j \in \{0, \dots, P - 1\}$: per ogni livello di budget $b \ge c$, viene valutata la transizione dinamica; qualora essa produca un rendimento strettamente superiore al valore corrente $m[i, b]$, la cella viene aggiornata e l'indice $j$ viene memorizzato in $s[i, b]$. Al termine dell'esecuzione, la cella $m[N, B]$ contiene il valore ottimo globale.
+Per ogni ruolo, la riga corrente viene inizialmente copiata dalla riga precedente ($m[i, b] \gets m[i-1, b]$), incorporando la decisione di base (nessun acquisto). Successivamente, si esamina ciascun candidato $j \in \{0, \dots, P - 1\}$: per ogni livello di budget $b \ge c$, viene valutato l'eventuale ingaggio del giocatore; qualora produca un rendimento strettamente superiore al valore corrente $m[i, b]$, la cella viene aggiornata e l'indice $j$ viene memorizzato in $s[i, b]$. Al termine dell'esecuzione, la cella $m[N, B]$ contiene il valore ottimo globale.
 
-\begin{algorithm}[!htbp]
+\begin{algorithm}[H]
 	\small
 	\caption{Calcolo del WAR Ottimale e della Tabella delle Scelte}
 	\label{alg:compute_optimal_war}
@@ -110,7 +105,7 @@ L'algoritmo procede per stadi crescenti del ruolo $i \in \{1, \dots, N\}$. Per o
 \subsubsection{Ricostruzione della Rosa Ottima}
 La procedura \textsc{Reconstruct-Optimal-Roster} (Algoritmo~\ref{alg:reconstruct_optimal_roster}) prende in ingresso la matrice delle decisioni $s$ e ricostruisce la configurazione ottimale operando a ritroso a partire dallo stato terminale $(N, B)$. A ogni passo $i$ decrescente da $N$ a $1$, l'indice memorizzato in $s[i, b]$ rivela l'azione intrapresa: se tale valore differisce da $-1$, il giocatore corrispondente viene aggiunto alla rosa dei titolari, il suo costo reale viene sommato al costo complessivo sostenuto e il budget residuo $b$ viene decrementato del costo scalato $c$. Se l'indice è pari a $-1$, nessun giocatore è stato ingaggiato per il ruolo $i$ e il budget residuo rimane inalterato. Il ciclo termina all'esaurimento dei ruoli, restituendo l'elenco degli ingaggi e la spesa cumulativa totale.
 
-\begin{algorithm}[!htbp]
+\begin{algorithm}[H]
 	\small
 	\caption{Ricostruzione della Rosa Ottima mediante Backtracking}
 	\label{alg:reconstruct_optimal_roster}
@@ -146,25 +141,30 @@ Il tempo di calcolo complessivo dell'Algoritmo~\ref{alg:compute_optimal_war} è 
 \end{equation}
 La fase iniziale prevede l'allocazione e l'azzeramento delle matrici bidimensionali $m$ ed $s$, ciascuna avente dimensioni $(N + 1) \times (B + 1)$. Tale operazione comporta l'inizializzazione di $2(N+1)(B+1)$ celle, richiedendo un tempo asintotico $T_{\text{init}} = \Theta(N \cdot B)$.
 
-La fase iterativa principale è strutturata su tre cicli annidati. Il ciclo più esterno itera esattamente $N$ volte per $i = 1, \dots, N$. All'inizio di ogni iterazione di riga, la copia del vettore precedente $m[i-1, 0 \dots B]$ richiede l'assegnamento di $B + 1$ valori, assorbendo un tempo $\Theta(B)$. Il secondo ciclo itera sui $P_i$ candidati disponibili per il ruolo $i$. Per ciascun candidato avente costo intero $c_{i,j}$, il ciclo più interno sul budget esegue la transizione per tutti i valori di $b$ compresi tra $c_{i,j}$ e $B$, compiendo esattamente $B - c_{i,j} + 1 \le B + 1$ passi. Poiché il corpo del ciclo interno esegue operazioni aritmetiche, confronti e accessi a matrice in tempo costante $\Theta(1)$, il contributo temporale complessivo della fase iterativa è formalizzato da:
+La fase iterativa principale è strutturata su tre cicli annidati. Il ciclo più esterno itera esattamente $N$ volte per $i = 1, \dots, N$. All'inizio di ogni iterazione di riga, la copia del vettore precedente $m[i-1, 0 \dots B]$ richiede l'assegnamento di $B + 1$ valori. Il secondo ciclo itera sui $P$ candidati disponibili per ciascun ruolo. Per ciascun candidato avente costo intero $\mathit{cost}_{i,j}$, il ciclo più interno sul budget esegue la valutazione per tutti i valori di $b$ compresi tra $\mathit{cost}_{i,j}$ e $B$, compiendo $B - \mathit{cost}_{i,j} + 1 \le B + 1$ passi. Poiché il corpo del ciclo interno esegue operazioni aritmetiche, confronti e accessi a matrice in tempo costante $\Theta(1)$, il contributo temporale complessivo della fase iterativa è formalizzato dalla sommatoria:
 \begin{equation}
-	T_{\text{loop}} = \sum_{i=1}^N \left( \Theta(B) + \sum_{j=0}^{P_i - 1} \sum_{b=c_{i,j}}^B \Theta(1) \right)
+	T_{\text{loop}} = \sum_{i=1}^N \left( \sum_{b=0}^B 1 + \sum_{j=0}^{P - 1} \sum_{b=\mathit{cost}_{i,j}}^B 1 \right)
 \end{equation}
-Poiché $0 \le c_{i,j} \le B$, la sommatoria interna è superiormente e inferiormente limitata da $\Theta(B)$. Nel caso canonico in cui ciascun ruolo presenti un numero omogeneo di candidati $P_i = P$, si ottiene:
+Poiché $0 \le \mathit{cost}_{i,j} \le B$, il numero di iterazioni del ciclo interno è superiormente limitato da $B - \mathit{cost}_{i,j} + 1 \le B + 1$. Maggiorando la sommatoria interna, si ottiene:
 \begin{equation}
-	T_{\text{loop}} = \sum_{i=1}^N \Big( \Theta(B) + P \cdot \Theta(B) \Big) = \sum_{i=1}^N \Theta(P \cdot B) = \Theta(N \cdot B \cdot P)
+	T_{\text{loop}} \le \sum_{i=1}^N \left( (B + 1) + \sum_{j=0}^{P - 1} (B + 1) \right) = \sum_{i=1}^N (P + 1)(B + 1) = N(P + 1)(B + 1)
+\end{equation}
+Sviluppando il prodotto algebrico $N(P + 1)(B + 1) = N \cdot P \cdot B + N \cdot P + N \cdot B + N$, la complessità temporale della fase iterativa risulta limitata superiormente da:
+\begin{equation}
+	T_{\text{loop}} = O(N \cdot B \cdot P)
 \end{equation}
 Sommando la fase di inizializzazione e la fase iterativa, la complessità temporale asintotica totale risulta:
 \begin{equation}
-	T(N, B, P) = \Theta(N \cdot B) + \Theta(N \cdot B \cdot P) = \Theta(N \cdot B \cdot P)
+	T(N, B, P) = \Theta(N \cdot B) + O(N \cdot B \cdot P) = O(N \cdot B \cdot P)
 \end{equation}
-Nel caso generale in cui il numero di candidati vari tra le posizioni, la complessità è più puntualmente descritta da $\Theta(B \sum_{i=1}^N P_i)$.
 
 \subsubsection{Occupazione di Memoria (Complessità Spaziale)}
-L'occupazione di memoria primaria è interamente dominata dalle due tabelle bidimensionali $m$ ed $s$. La matrice dei valori ottimi $m$ alloca $(N + 1) \times (B + 1)$ elementi in virgola mobile, mentre la matrice delle decisioni $s$ alloca $(N + 1) \times (B + 1)$ valori interi con segno. Le restanti variabili ausiliarie di controllo scalari impiegano memoria costante $O(1)$.
+L'occupazione di memoria primaria è interamente dominata dalle due tabelle bidimensionali $m$ ed $s$. La matrice dei valori ottimi $m$ alloca $(N + 1) \times (B + 1)$ elementi in virgola mobile, mentre la matrice delle decisioni $s$ alloca $(N + 1) \times (B + 1)$ valori interi con segno. Le restanti variabili ausiliarie di controllo scalari impiegano memoria costante $\Theta(1)$.
 
 La complessità spaziale complessiva è dunque data da:
 \begin{equation}
 	S(N, B) = 2 \times (N + 1) \times (B + 1) \cdot \Theta(1) = \Theta(N \cdot B)
 \end{equation}
 È rilevante sottolineare che la complessità spaziale è rigorosamente indipendente dal numero di candidati per ruolo $P$, dipendendo esclusivamente dal numero di ruoli $N$ e dal budget discretizzato $B$.
+
+\newpage

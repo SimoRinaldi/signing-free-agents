@@ -20,9 +20,9 @@ Per ciascuno dei 9 ruoli sono disponibili $P = 30$ candidati svincolati, per un 
 
 Ciascun atleta $k \in \{1, \dots, P\}$ all'interno del ruolo $i \in \{1, \dots, N\}$ è formalmente caratterizzato da una tripla di attributi:
 \begin{equation}
-	p_{i, k} = \big( \mathit{name}_{i, k}, \; \mathit{cost}_{i, k}, \; v_{i, k} \big)
+	p_{i, k} = \big( \mathit{name}_{i, k}, \; \mathit{cost}_{i, k}, \; \mathit{war}_{i, k} \big)
 \end{equation}
-dove $\mathit{cost}_{i, k} \in \mathbb{N}^+$ rappresenta l'ingaggio contrattuale, mentre $v_{i, k} = \text{WAR} \ge 0$ rappresenta la metrica WAR (\textit{Wins Above Replacement}), che stima quante vittorie in più il giocatore apporta alla squadra rispetto a un sostituto medio.
+dove $\mathit{cost}_{i, k} \in \mathbb{N}^+$ rappresenta l'ingaggio contrattuale, mentre $\mathit{war}_{i, k} \ge 0$ rappresenta la metrica WAR (\textit{Wins Above Replacement}), che stima quante vittorie in più il giocatore apporta alla squadra rispetto a un sostituto medio.
 
 \subsubsection{Generazione degli Scenari di Test}
 Per analizzare la crescita del tempo di esecuzione e del consumo di memoria, sono stati generati 10 scenari di test incrementali, denominati da \texttt{scenario\_01} a \texttt{scenario\_10} (con suffisso \texttt{\_N9\_BXXXX\_P30}). A questi si aggiunge un'istanza minima di verifica denominata \texttt{scenario\_00\_N3\_B6\_P3} ($N=3$, $B=6$, $P=3$), pensata per test rapidi e per ispezionare facilmente le matrici prodotte.
@@ -30,9 +30,9 @@ Per analizzare la crescita del tempo di esecuzione e del consumo di memoria, son
 Nei test è stato mantenuto fisso il numero di atleti, facendo variare soltanto il budget nominale $X$. Il budget parte da un valore base di $\$350\,000\,000$ nello scenario 01 e cresce di $\$50\,000\,000$ a ogni scenario successivo, fino a raggiungere $\$800\,000\,000$ nello scenario 10.
 
 Di conseguenza, il budget discreto associato varia progressivamente nell'intervallo:
-\begin{equation}
+\[
 	B \in \{3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000\}
-\end{equation}
+\]
 La dimensione del problema per la programmazione dinamica è determinata dal prodotto $N \cdot B \cdot P$.
 
 La Tabella~\ref{tab:scenarios_overview} riassume i parametri operativi di ciascuno dei 10 scenari generati.
@@ -77,32 +77,28 @@ All'avvio, il modulo \texttt{loader.py} legge il file JSON, crea gli oggetti imm
 Per migliorare le prestazioni e ridurre l'uso di memoria (consentendo così di gestire istanze più grandi), sono state sviluppate diverse varianti dell'algoritmo base per il calcolo del valore ottimo, confrontate poi con la formulazione di riferimento.
 
 \subsubsection{Variante Bottom-Up senza Matrice \texorpdfstring{$s$}{s}}
-L'algoritmo base (Algoritmo~\ref{alg:compute_optimal_war}) alloca due tabelle bidimensionali: la matrice dei valori $m$ e la matrice delle decisioni $s$. Come prima variante mirata a risparmiare spazio, viene eliminata la matrice ausiliaria $s$, calcolando e restituendo soltanto la matrice dei valori $m$.
+L'algoritmo base (Algoritmo~\ref{alg:compute_optimal_war}) alloca due tabelle bidimensionali: la matrice dei valori $m$ e la matrice delle decisioni $s$. Come prima variante mirata a risparmiare spazio, viene eliminata la matrice ausiliaria $s$, calcolando e restituendo soltanto la matrice dei valori $m$. Il tempo di calcolo rimane invariato a $O(N \cdot B \cdot P)$, ma la memoria necessaria scende da $2(N + 1)(B + 1)$ a $(N + 1)(B + 1)$ celle, con un risparmio netto del $50\%$ dello spazio.
 
 Il codice Python implementato è il seguente:
 
+\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 def compute_optimal_war_without_s(N, X, players, cost_unit=100000):
     B = floor(X / cost_unit)
     m = [[0.0 for _ in range(B + 1)] for _ in range(N + 1)]
-
     for i in range(1, N + 1):
         m[i][:] = m[i - 1][:]
-
         for p in players[i - 1]:
             c = p.cost // cost_unit
             war_p = p.war
-
             for b in range(c, B + 1):
                 war = m[i - 1][b - c] + war_p
                 if war > m[i][b]:
                     m[i][b] = war
-
     optimal_war = m[N][B]
     return optimal_war, m
 \end{lstlisting}
-
-Il tempo di calcolo rimane invariato a $\Theta(N \cdot B \cdot P)$, ma la memoria necessaria scende da $2(N + 1)(B + 1)$ a $(N + 1)(B + 1)$ celle, con un risparmio netto del $50\%$ dello spazio.
+\end{minipage}
 
 \subsubsection{Variante a Vettore Singolo}
 Nell'algoritmo classico, per calcolare il valore ottimo si usa una tabella con $N+1$ righe e $B+1$ colonne, occupando uno spazio in memoria pari a $\Theta(N \cdot B)$. Tuttavia, quando si calcolano i valori per il ruolo $i$, servono solo i valori del ruolo precedente $i-1$. Non serve quindi conservare la storia delle righe precedenti: basta usare un unico vettore di dimensione $B+1$.
@@ -115,6 +111,7 @@ Il punto chiave di questa variante è la direzione del ciclo sul budget, che dev
 
 Il codice Python implementato è il seguente:
 
+\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 def compute_optimal_war_with_one_vector(N, X, players, cost_unit=100000):
     B = floor(X / cost_unit)
@@ -138,8 +135,9 @@ def compute_optimal_war_with_one_vector(N, X, players, cost_unit=100000):
     optimal_war = solution[B]
     return optimal_war
 \end{lstlisting}
+\end{minipage}
 
-Il tempo di calcolo rimane invariato ($\Theta(N \cdot B \cdot P)$), perché il numero di controlli da fare è lo stesso. Il vantaggio sta nella memoria, che scende da $\Theta(N \cdot B)$ a \textbf{$\Theta(B)$}, diventando del tutto indipendente dal numero di ruoli $N$.
+Il tempo di calcolo rimane invariato ($O(N \cdot B \cdot P)$), perché il numero di controlli da fare è lo stesso. Il vantaggio sta nella memoria, che scende da $\Theta(N \cdot B)$ a \textbf{$\Theta(B)$}, diventando del tutto indipendente dal numero di ruoli $N$.
 
 Il limite principale di questo approccio è che, sovrascrivendo i valori nello stesso vettore a ogni riga, al termine dell'esecuzione si perde la traccia delle scelte effettuate: non è quindi possibile risalire a quali giocatori compongono la rosa ottima.
 
@@ -148,6 +146,7 @@ L'approccio \textit{top-down} implementa la relazione di ricorrenza di Bellman t
 
 Il codice Python implementato è il seguente:
 
+\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 def compute_optimal_war_with_recursion(N, X, players, cost_unit=100000):
     B = floor(X / cost_unit)
@@ -175,23 +174,25 @@ def compute_optimal_war_with_recursion(N, X, players, cost_unit=100000):
     optimal_war = dp(N, B)
     return optimal_war
 \end{lstlisting}
+\end{minipage}
 
-Secondo la teoria, nel caso peggiore l'algoritmo deve calcolare l'intera tabella, con un costo di tempo $O(N \cdot B \cdot P)$ e di memoria $\Theta(N \cdot B)$ (a cui si sommano gli $O(N)$ record di attivazione sullo stack della ricorsione). Nella pratica, però, i costi effettivi dei contratti lasciano molti stati $(i, b)$ non raggiungibili a ritroso da $(N, B)$. La variante top-down calcola solo gli stati davvero necessari alla soluzione, risultando nettamente più rapida del bottom-up sugli scenari di prova considerati.
+Secondo la teoria, nel caso peggiore, l'algoritmo deve calcolare l'intera tabella con una complessità temporale di $O(N \cdot B \cdot P)$ e spaziale di $\Theta(N \cdot B)$ (a cui si sommano gli $O(N)$ record di attivazione sullo stack della ricorsione). Nella pratica, però, i costi effettivi dei contratti lasciano molti stati $(i, b)$ non raggiungibili a ritroso da $(N, B)$. La variante top-down calcola solo gli stati davvero necessari alla soluzione, risultando nettamente più rapida del bottom-up sugli scenari di prova considerati.
 
 \subsubsection{Filtraggio Preliminare dei Candidati Dominati}
 Un'ulteriore ottimizzazione consiste nel ridurre in partenza il numero di candidati per ciascun ruolo tramite una procedura di \textit{filtraggio preliminare}, scartando i candidati dominati.
 Poiché per ogni ruolo si seleziona al massimo un giocatore, considerati due atleti $p_1, p_2$ dello stesso ruolo $i$, si dice che $p_1$ \textbf{domina} $p_2$ se:
 \begin{equation}
-	c_{i, p_1} \le c_{i, p_2} \quad \wedge \quad v_{i, p_1} \ge v_{i, p_2}
+	\mathit{cost}_{i, p_1} \le \mathit{cost}_{i, p_2} \quad \wedge \quad \mathit{war}_{i, p_1} \ge \mathit{war}_{i, p_2}
 \end{equation}
-con almeno una disuguaglianza stretta. In sintesi, un candidato dominato costa di più (o uguale) ma garantisce un rendimento inferiore (o uguale): non potrà mai far parte di una squadra ottima e può quindi essere eliminato subito senza rischiare di escludere la soluzione migliore.
+con almeno una disuguaglianza stretta. In sintesi, un candidato dominato presenta un costo maggiore o uguale a fronte di un rendimento inferiore o uguale rispetto a un altro atleta del medesimo ruolo: non potrà mai far parte di una rosa ottima e può quindi essere eliminato subito senza rischiare di escludere la soluzione migliore.
 
 L'algoritmo di pre-filtraggio opera in due fasi:
 \begin{enumerate}
-	\item Per ogni ruolo, elimina gli atleti con $v \le 0$ o con costo eccedente il budget totale $B$, e ordina i restanti candidati per costo crescente (e WAR decrescente in caso di pareggio) in tempo $O(P \log P)$.
+	\item Per ogni ruolo, elimina gli atleti con $\mathit{war} \le 0$ o con costo eccedente il budget totale $B$, e ordina i restanti candidati per costo crescente (e WAR decrescente in caso di pareggio) in tempo $O(P \log P)$.
 	\item Esegue una scansione lineare in tempo $O(P)$ mantenendo il massimo WAR osservato fino a quel punto, conservando solo i candidati che presentano un WAR strettamente superiore al massimo corrente.
 \end{enumerate}
 
+\noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
 def filter_players(players, cost_unit=100000, total_budget=None):
     valid_players = []
@@ -215,8 +216,9 @@ def filter_players(players, cost_unit=100000, total_budget=None):
         filtered_players.append(role_valid)
     return filtered_players
 \end{lstlisting}
+\end{minipage}
 
-Il costo computazionale preliminare è $O(N \cdot P \log P)$, trascurabile rispetto alla programmazione dinamica. Questa operazione riduce i candidati effettivi da $P$ a un sottoinsieme $P' \ll P$, velocizzando sensibilmente il ciclo interno di tutte le varianti bottom-up che non necessitano della corrispondenza degli indici nella matrice $s$.
+Il costo computazionale preliminare è $O(N \cdot P \log P + N \cdot P) = O(N \cdot P \log P)$, trascurabile rispetto alla programmazione dinamica. Questa operazione riduce i candidati effettivi da $P$ a un sottoinsieme $P' \ll P$, velocizzando sensibilmente il ciclo interno di tutte le varianti bottom-up che non necessitano della corrispondenza degli indici nella matrice $s$.
 
 \subsection{Confronto delle Prestazioni e Risultati Empirici}
 La sperimentazione è stata condotta eseguendo le sei varianti algoritmiche sui 10 scenari a budget crescente ($B \in [3500, 8000]$), misurando per ciascuna configurazione il tempo minimo di calcolo su $K = 15$ iterazioni e il picco di memoria heap tracciato.
@@ -255,13 +257,13 @@ I tempi di calcolo misurati per ciascun algoritmo sui 10 scenari sono riassunti 
 	\label{fig:optimal_value_plots}
 \end{figure}
 
-All'aumentare del budget discreto $B$, i tempi di esecuzione del Bottom-Up base e delle sue varianti principali mostrano una crescita chiaramente lineare. Poiché il numero di ruoli $N = 9$ e il numero di candidati $P = 30$ sono mantenuti costanti in tutti gli scenari, la dimensione complessiva dell'istanza scala in modo direttamente proporzionale a $B$. Ad esempio, confrontando gli scenari estremi ($B = 3500$ e $B = 8000$), a fronte di una crescita del budget di circa $2.29$ volte si registra un incremento dei tempi di calcolo di circa $2.36$ volte, confermando fedelmente l'andamento previsto dall'analisi asintotica $\Theta(N \cdot B \cdot P)$.
+All'aumentare del budget discreto $B$, i tempi di esecuzione del Bottom-Up base e delle sue varianti principali mostrano una crescita chiaramente lineare. Poiché il numero di ruoli $N = 9$ e il numero di candidati $P = 30$ sono mantenuti costanti in tutti gli scenari, la dimensione complessiva dell'istanza scala in modo direttamente proporzionale a $B$. Ad esempio, confrontando gli scenari estremi ($B = 3500$ e $B = 8000$), a fronte di una crescita del budget di circa $2.29$ volte si registra un incremento dei tempi di calcolo di circa $2.36$ volte, confermando fedelmente l'andamento previsto dall'analisi asintotica $O(N \cdot B \cdot P)$.
 
 Un aspetto interessante riguarda il confronto tra il Bottom-Up su matrice e la variante a vettore singolo. Anche se quest'ultima opera su una sola riga anziché sull'intera tabella, il numero totale di controlli e aggiornamenti interni rimane identico. Per verificare questa equivalenza è stata calcolata la discrepanza percentuale tra i tempi:
 \begin{equation}
 	\Delta_{\text{time}}\% = \frac{T_{\text{vettore}} - T_{\text{matrice}}}{T_{\text{matrice}}} \times 100
 \end{equation}
-Su tutti i 10 scenari analizzati, la differenza media tra i tempi delle due versioni è di appena il $+4.99\%$; applicando il filtraggio preliminare scende addirittura all'$1.06\%$. Questa piccola differenza è del tutto trascurabile e dipende solo da dettagli interni di Python: la versione con matrice sfrutta la copia rapida di un'intera riga (\texttt{m[i][:] = m[i-1][:]}), mentre quella a vettore singolo compie un controllo condizionale (\texttt{if}) elemento per elemento. I dati confermano quindi che la variante a vettore singolo preserva integralmente la complessità temporale $\Theta(N \cdot B \cdot P)$.
+Su tutti i 10 scenari analizzati, la differenza media tra i tempi delle due versioni è di appena il $+4.99\%$; applicando il filtraggio preliminare scende addirittura all'$1.06\%$. Questa piccola differenza è del tutto trascurabile e dipende solo da dettagli interni di Python: la versione con matrice sfrutta la copia rapida di un'intera riga (\texttt{m[i][:] = m[i-1][:]}), mentre quella a vettore singolo compie un controllo condizionale (\texttt{if}) elemento per elemento. I dati confermano quindi che la variante a vettore singolo preserva integralmente la complessità temporale $O(N \cdot B \cdot P)$.
 
 L'applicazione del filtro preliminare permette invece di ridurre notevolmente i tempi di calcolo mantenendo intatta la correttezza del risultato. Scartando in partenza i candidati dominati all'interno di ciascun ruolo, il numero effettivo di giocatori da valutare scende in media da $P = 30$ a circa $P' \approx 10$. Poiché il ciclo più interno compie un numero di iterazioni proporzionale a $P'$, il tempo di esecuzione si riduce di circa due terzi (rispecchiando il rapporto teorico $P'/P \approx 1/3$), consentendo un netto guadagno di velocità.
 
@@ -302,18 +304,19 @@ Per quanto riguarda il Top-Down, l'occupazione di memoria segue da vicino il pro
 \end{itemize}
 
 \subsubsection{Ricostruzione della Rosa e Verifica dei Risultati}
-È stato verificato che le diverse strategie di ricostruzione producano la stessa soluzione ottima. Su tutti i 10 scenari analizzati, la ricostruzione basata sulla matrice decisionale $s$ e quella eseguita direttamente sulla matrice dei valori $m$ identificano esattamente la stessa combinazione di giocatori, confermando la piena correttezza della risalita senza matrice ausiliaria e attestando il valore ottimo sempre a $63.0$ WAR con la copertura di tutti i 9 ruoli previsti.
+È stato verificato che le diverse strategie di ricostruzione producano la stessa soluzione ottima. Su tutti i 10 scenari analizzati, la ricostruzione basata sulla matrice decisionale $s$ e quella eseguita direttamente sulla matrice dei valori $m$ identificano esattamente la stessa combinazione di giocatori, confermando la piena correttezza della risalita senza matrice ausiliaria e producendo sempre lo stesso valore ottimo con la copertura di tutti i 9 ruoli previsti.
 
 \begin{figure}[!htbp]
 	\centering
 	\includegraphics[width=0.72\textwidth]{plot_reconstruction_memory.png}
-	\caption{Confronto dell'occupazione di memoria heap tra la strategia con matrice delle decisioni $s$ (risalita $\Theta(N)$) e la strategia con sola matrice $m$ (risalita $O(N \cdot P)$).}
+	\caption{Confronto dell'occupazione di memoria heap tra la strategia con matrice delle decisioni $s$ e la strategia con sola matrice $m$.}
 	\label{fig:reconstruction_memory_plot}
 \end{figure}
 
-Come mostrato nella Figura~\ref{fig:reconstruction_memory_plot}, la scelta del metodo di ricostruzione comporta un chiaro compromesso tra tempo di risalita e memoria occupata durante la fase tabellare:
+Come mostrato nella Figura~\ref{fig:reconstruction_memory_plot}, la scelta del metodo di ricostruzione comporta un chiaro compromesso tra tempo di esecuzione e memoria occupata:
 \begin{itemize}
-	\item \textbf{Ricostruzione con matrice $s$:} consente di estrarre la formazione titolare in tempo immediato $\Theta(N)$, ma richiede di mantenere in memoria entrambe le matrici $m$ ed $s$ durante tutto il calcolo dinamico, impiegando complessivamente $2(N+1)(B+1)$ celle e raddoppiando la memoria allocata.
-	\item \textbf{Ricostruzione senza matrice $s$:} ricostruisce la soluzione a ritroso controllando direttamente la matrice $m$ in tempo $O(N \cdot P)$. Poiché $N = 9$ e $P = 30$, l'operazione compie al massimo 270 controlli elementari in una frazione di millisecondo, del tutto trascurabile rispetto al calcolo della tabella. In cambio, permette di dimezzare l'occupazione di memoria allocando solo la matrice $m$ da $(N+1)(B+1)$ elementi.
+	\item \textbf{Ricostruzione con matrice $s$:} consente di estrarre la formazione in tempo lineare $\Theta(N)$, ma richiede di mantenere in memoria entrambe le matrici $m$ ed $s$ durante tutto il calcolo dinamico, impiegando complessivamente $2(N+1)(B+1)$ celle e raddoppiando la memoria allocata.
+	\item \textbf{Ricostruzione senza matrice $s$:} ricostruisce la soluzione a ritroso controllando direttamente la matrice $m$ in tempo $O(N \cdot P)$. In cambio, permette di dimezzare l'occupazione di memoria allocando solo la matrice $m$ da $(N+1)(B+1)$ elementi.
 \end{itemize}
-Infine, la variante a vettore singolo, pur offrendo la massima efficienza in termini di memoria ($\Theta(B)$), non conserva le informazioni necessarie per risalire alle decisioni prese: rende quindi impossibile ricostruire la composizione della rosa, limitandosi al calcolo del solo valore massimo di WAR.
+
+\newpage

@@ -77,6 +77,10 @@
     \let\theHWcourse{#1}%
   }%
 }
+\newcommand{\HWtitle}[2][]{%
+  \def\theHWsubtitle{#1}%
+  \def\theHWtitle{#2}%
+}
 \newcommand{\HWextension}{%
   \def\theHWextension{Yes}%
 }
@@ -142,7 +146,16 @@
 \let\oldmaketitle\maketitle
 \renewcommand{\maketitle}{%
   \author{\theHWauthors}
-  \title{\theHWcourse\ifthenelse{\isundefined{\theHWno}}{}{ -- Homework \theHWno}}                                                            \oldmaketitle
+  \title{%
+    {\large\scshape \theHWcourse\ifthenelse{\isundefined{\theHWno}}{}{ -- Homework \theHWno}}\\[1.2em]
+    \ifthenelse{\isundefined{\theHWtitle}}{}{%
+      {\LARGE\bfseries \theHWtitle}\\[0.4em]
+      \ifthenelse{\equal{\theHWsubtitle}{}}{}{%
+        {\large\itshape \theHWsubtitle}\\[0.8em]
+      }%
+    }%
+  }%
+  \oldmaketitle
   \begin{center}
     \ifthenelse{\isundefined{\theHWextension}}{}{%
       {\Large Using Extension.}

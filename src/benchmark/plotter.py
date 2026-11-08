@@ -113,7 +113,7 @@ class PerformancePlotter:
             ax.plot(
                 subset_s["NB"],
                 subset_s["memory_kib"],
-                label="Con matrice s (m + s, ricostruzione O(N))",
+                label="Con matrice s (m + s)",
                 color="firebrick",
                 marker="o",
                 linewidth=2,
@@ -122,7 +122,7 @@ class PerformancePlotter:
             ax.plot(
                 subset_no_s["NB"],
                 subset_no_s["memory_kib"],
-                label="Senza matrice s (solo m, ricostruzione O(N*P))",
+                label="Senza matrice s (solo m)",
                 color="royalblue",
                 marker="s",
                 linewidth=2,

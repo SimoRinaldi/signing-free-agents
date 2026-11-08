@@ -3,9 +3,11 @@
 Questa sezione fornisce le indicazioni operative necessarie alla configurazione dell'ambiente, all'esecuzione degli algoritmi realizzati e all'ispezione delle tabelle prodotte, illustrando inoltre le linee guida per la conduzione di ulteriori sperimentazioni su nuove istanze del problema.
 
 \subsection{Requisiti e Configurazione dell'Ambiente}
-Il software sviluppato richiede un interprete Python in versione 3.10 o successiva ed è progettato per essere interamente multipiattaforma (Linux, macOS, Windows). Le librerie esterne necessarie all'esecuzione sono elencate nel file \texttt{requirements.txt} e comprendono: \texttt{numpy}, \texttt{pandas} e \texttt{matplotlib}.
+Il software sviluppato richiede un interprete Python in versione 3.10 o successiva. Le librerie esterne necessarie all'esecuzione sono elencate nel file \texttt{requirements.txt} e comprendono: \texttt{numpy}, \texttt{pandas} e \texttt{matplotlib}.
 
 Per predisporre l'ambiente di esecuzione isolato, si consiglia la creazione di un ambiente virtuale dedicato tramite i comandi:
+
+\noindent\begin{minipage}{\linewidth}
 \begin{verbatim}
 # Creazione dell'ambiente virtuale
 python3 -m venv .venv
@@ -21,6 +23,7 @@ source .venv/bin/activate
 # Installazione delle librerie richieste
 pip install -r requirements.txt
 \end{verbatim}
+\end{minipage}
 
 \subsection{Modalità di Esecuzione}
 Il programma principale del progetto è \texttt{demo.py}, che permette sia di eseguire i calcoli su tutti gli scenari generando i risultati, sia di mostrare le tabelle e la rosa ottima. È inoltre disponibile lo script \texttt{main.py} per eseguire i test in modo automatico da terminale.
@@ -29,13 +32,13 @@ Il programma principale del progetto è \texttt{demo.py}, che permette sia di es
 Al fine di garantire la massima portabilità tra sistemi operativi differenti, nella radice del progetto sono stati predisposti specifici script di lancio automatico della demo:
 \begin{itemize}
 	\item \textbf{Sistemi Unix/Linux e macOS:} tramite lo script Bash \texttt{./run\_demo.sh} (previa assegnazione dei permessi di esecuzione con \texttt{chmod +x run\_demo.sh});
-	\item \textbf{Sistemi Microsoft Windows:} tramite lo script batch \texttt{run\_demo.bat} (avviabile con un semplice doppio clic dall'esploratore file o da riga di comando);
+	\item \textbf{Sistemi Microsoft Windows:} tramite lo script batch \texttt{run\_demo.bat} (avviabile da riga di comando o direttamente dall'interfaccia grafica);
 	\item \textbf{Invocazione standard Python:} mediante il comando \texttt{python demo.py} (o \texttt{python3 demo.py}).
 \end{itemize}
 
 All'avvio, il programma mostra una schermata articolata in due fasi:
 \begin{enumerate}
-	\item \textbf{Fase di calcolo ed elaborazione degli scenari:} il programma richiede se avviare la sperimentazione completa. Rispondendo affermativamente, il software elabora in sequenza tutti gli undici scenari presenti nella cartella \texttt{scenarios/}, eseguendo per ciascuno le sei varianti algoritmiche su $K = 15$ iterazioni, misurando tempi e picchi di memoria tramite \texttt{tracemalloc}, salvando le metriche in \texttt{results/benchmark\_metrics.csv}, esportando le tabelle dinamiche CSV e generando in automatico i tre grafici PNG di sintesi prestazionale. Qualora i risultati siano già stati calcolati in precedenza, l'utente può saltare tale fase per accedere istantaneamente ai dati già archiviati;
+	\item \textbf{Fase di calcolo ed elaborazione degli scenari:} il programma richiede se avviare la sperimentazione completa. Rispondendo affermativamente, il software elabora in sequenza tutti gli undici scenari presenti nella cartella \texttt{scenarios/}, eseguendo per ciascuno le sei varianti algoritmiche su $K = 15$ iterazioni, misurando tempi e picchi di memoria tramite \texttt{tracemalloc}, salvando le metriche in \texttt{results/benchmark\_metrics.csv}, esportando le tabelle dinamiche CSV e generando in automatico i tre grafici PNG di sintesi prestazionale. Qualora i risultati siano già stati calcolati in precedenza, l'utente può saltare tale fase per accedere istantaneamente ai dati già archiviati.
 	\item \textbf{Fase di esplorazione interattiva:} conclusa la fase precedente, si apre il menu principale che offre cinque voci:
 	\begin{itemize}
 		\item \textbf{Opzione 1 (Mostra rosa ottimale):} visualizza in formato tabellare la rosa ottimale identificata dall'algoritmo di ricostruzione per lo scenario selezionato, con i dettagli di costo e rendimento per ciascun ruolo, accompagnata da un riepilogo (WAR totale, spesa sostenuta e budget residuo);
@@ -47,7 +50,7 @@ All'avvio, il programma mostra una schermata articolata in due fasi:
 \end{enumerate}
 
 \subsubsection{Ispezione delle Tabelle Generate}
-Per la visualizzazione integrale delle tabelle, nei casi in cui il budget assuma dimensioni realistiche rendendo impossibile una lettura a schermo, bisogna spostarsi all'interno della cartella \texttt{results/}:
+Per la visualizzazione integrale delle tabelle, nei casi in cui il budget assuma dimensioni realistiche rendendo impossibile una lettura a schermo, è possibile consultare i file generati nella cartella \texttt{results/}:
 \begin{itemize}
 	\item \texttt{matrice\_m\_<scenario>.csv}: contiene la matrice bidimensionale dei valori WAR, con intestazioni di riga associate a ciascun ruolo e intestazioni di colonna relative al budget discretizzato $b \in \{0, \dots, B\}$;
 	\item \texttt{matrice\_s\_<scenario>.csv}: contiene la matrice bidimensionale delle scelte, in cui ogni cella $s[i, b]$ riporta l'indice $j \ge 0$ del candidato ingaggiato o il valore convenzionale $-1$ qualora per il ruolo $i$ non sia stato selezionato alcun giocatore.
@@ -58,6 +61,8 @@ Il software è progettato per consentire la sperimentazione su nuove istanze, va
 
 \subsubsection{Formato dei Dati di Ingresso}
 Le nuove istanze del problema devono essere codificate in file con estensione \texttt{.json} e collocate all'interno della cartella \texttt{scenarios/}. La struttura sintattica attesa dal modulo di caricamento (\texttt{src/core/loader.py}) è la seguente:
+
+\noindent\begin{minipage}{\linewidth}
 \begin{verbatim}
 {
   "scenario_name": "scenario_personalizzato",
@@ -74,12 +79,14 @@ Le nuove istanze del problema devono essere codificate in file con estensione \t
   ]
 }
 \end{verbatim}
+\end{minipage}
 Il modulo calcola automaticamente la dimensione dell'istanza e ordina gli scenari in base alla complessità prima dell'esecuzione dei test.
 
 \subsubsection{Linee Guida per Ulteriori Sperimentazioni}
 Per estendere la sperimentazione oltre la variazione del budget, il software permette di testare nuove configurazioni modificando semplicemente i parametri nei file JSON:
 \begin{itemize}
-	\item \textbf{Variazione dei ruoli ($N$):} testando istanze con un numero di ruoli diverso da N=9 (tipico del baseball), è possibile verificare che tempo e memoria crescano in modo lineare, coerentemente con le complessità teoriche $\Theta(N \cdot B \cdot P)$ e $\Theta(N \cdot B)$;
-	\item \textbf{Variazione dei candidati ($P$):} modificando il numero di giocatori per ruolo si può confermare che l'occupazione di memoria resta costante (essendo indipendente da $P$) e analizzare l'efficacia del filtro, che scarta una quota percentuale maggiore di giocatori dominati quando il numero di candidati aumenta;
-	\item \textbf{Variazione di $\text{COST\_UNIT}$:} riducendo l'unità di discretizzazione, il budget $B$ aumenta a parità di spesa reale, permettendo di osservare la natura pseudo-polinomiale dell'algoritmo al crescere della dimensione della tabella.
+	\item \textbf{Variazione dei ruoli ($N$):} testando istanze con un numero di ruoli diverso da $N = 9$ (tipico del baseball), è possibile verificare che tempo e memoria crescano in modo lineare, coerentemente con le complessità teoriche $O(N \cdot B \cdot P)$ e $\Theta(N \cdot B)$;
+	\item \textbf{Variazione dei candidati ($P$):} modificando il numero di giocatori per ruolo si può confermare che l'occupazione di memoria resta costante (essendo indipendente da $P$) e analizzare l'efficacia del filtro, che scarta una quota percentuale maggiore di giocatori dominati quando il numero di candidati aumenta.
 \end{itemize}
+
+\newpage
