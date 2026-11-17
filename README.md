@@ -16,7 +16,7 @@ Nel contesto dell'ottimizzazione combinatoria, il problema si configura come un'
 - È possibile ingaggiare **al massimo un giocatore per ciascuno degli $N$ ruoli** disponibili (nel baseball canonico $N=9$).
 - La spesa complessiva non può eccedere un **budget finanziario prefissato** $X$.
 
-Per consentire l'accesso immediato $\Theta(1)$ alle tabelle dinamiche senza errori di approssimazione floating-point, i compensi monetari sono scalati tramite una costante intera $\text{COST\_UNIT} = 100\,000$, riconducendo l'istanza a un budget discreto intero $B = \lfloor X / \text{COST\_UNIT} \rfloor$.
+Per consentire l'accesso immediato $\Theta(1)$ alle tabelle dinamiche senza errori di approssimazione floating-point, i compensi monetari sono scalati tramite la costante intera `COST_UNIT` ($u = 100\,000$), riconducendo l'istanza a un budget discreto intero $B = \lfloor X / u \rfloor$.
 
 ---
 
